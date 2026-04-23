@@ -96,13 +96,7 @@ const positionData = [
   { name: '业务', value: 20 },
 ];
 
-const skillsDataMap: Record<string, { name: string, value: number }[]> = {
-  '全部': [
-    { name: '高级职称', value: 45 },
-    { name: '职业资格A类', value: 38 },
-    { name: '高级技师', value: 25 },
-    { name: '其他持证', value: 60 },
-  ],
+const structureData: Record<string, { name: string, value: number }[]> = {
   '职称': [
     { name: '正高级', value: 15 },
     { name: '副高级', value: 30 },
@@ -111,19 +105,32 @@ const skillsDataMap: Record<string, { name: string, value: number }[]> = {
     { name: '初级', value: 80 },
   ],
   '职业资格': [
-    { name: '注册建造师', value: 22 },
-    { name: '注册建筑师', value: 12 },
-    { name: '注册会计师', value: 18 },
-    { name: '法律资格', value: 8 },
+    { name: '一级建造师', value: 12 },
+    { name: '二级建造师', value: 25 },
+    { name: '注册造价师', value: 18 },
+    { name: '注册安全师', value: 10 },
+    { name: '注册消防师', value: 5 },
   ],
   '职业技能': [
-    { name: '高级技师', value: 20 },
-    { name: '技师', value: 40 },
-    { name: '高级工', value: 60 },
-    { name: '中级工', value: 45 },
+    { name: '高级技师', value: 8 },
+    { name: '技师', value: 15 },
+    { name: '高级工', value: 45 },
+    { name: '中级工', value: 60 },
     { name: '初级工', value: 30 },
-  ],
+  ]
 };
+
+structureData['全部'] = [
+  ...structureData['职称'],
+  ...structureData['职业资格'],
+  ...structureData['职业技能']
+].sort((a, b) => b.value - a.value).slice(0, 6);
+
+const hometownData = [
+  { name: '本地', value: 72 },
+  { name: '周边', value: 38 },
+  { name: '外省', value: 18 },
+];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -147,7 +154,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeSkillTab, setActiveSkillTab] = useState('职称');
+  const [activeStructureTab, setActiveStructureTab] = useState('全部');
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -423,8 +430,51 @@ export default function App() {
             </ResponsiveContainer>
           </ChartCard>
 
-          {/* 10. 人员籍贯分布 */}
-          <ChartCard title="人员籍贯分布">
+          {/* 10. 职称、职业资格、职业技能结构分布 */}
+          <ChartCard title="职称、职业资格、职业技能结构分布" className="md:col-span-2">
+            <div className="flex h-full w-full gap-4">
+              <div className="flex w-24 shrink-0 flex-col justify-center gap-2 border-r border-white/10 pr-4">
+                {['全部', '职称', '职业资格', '职业技能'].map(tab => (
+                  <button 
+                    key={tab}
+                    onClick={() => setActiveStructureTab(tab)}
+                    className={`rounded-md px-3 py-2 text-left text-xs transition-all ${
+                      activeStructureTab === tab 
+                        ? 'bg-[#00D4FF]/20 text-[#00D4FF] border border-[#00D4FF]/50' 
+                        : 'border border-transparent text-slate-400 hover:bg-white/5'
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+              <div className="flex-1 min-w-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart 
+                    data={structureData[activeStructureTab]} 
+                    layout="vertical" 
+                    margin={{ top: 10, right: 30, left: 10, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#ffffff10" />
+                    <XAxis type="number" hide />
+                    <YAxis 
+                      dataKey="name" 
+                      type="category" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fontSize: 10, fill: '#cbd5e1' }}
+                      width={80}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="value" fill="#00D4FF" radius={[0, 4, 4, 0]} barSize={20} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </ChartCard>
+
+          {/* 11. 人才籍贯分布 */}
+          <ChartCard title="人才籍贯分布">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -443,52 +493,6 @@ export default function App() {
                 <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs text-slate-400">{value}</span>} />
               </PieChart>
             </ResponsiveContainer>
-          </ChartCard>
-
-          {/* 11. 职称、职业资格、职业技能结构分布 */}
-          <ChartCard title="职称、职业资格、职业技能结构分布" className="md:col-span-2">
-            <div className="flex h-full gap-4">
-              {/* Vertical Tabs */}
-              <div className="flex flex-col gap-2 border-r border-white/5 pr-4 pt-2">
-                {['全部', '职称', '职业资格', '职业技能'].map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveSkillTab(tab)}
-                    className={`whitespace-nowrap px-3 py-1.5 text-left text-xs font-medium transition-all rounded-md ${
-                      activeSkillTab === tab 
-                        ? 'bg-[#00D4FF]/20 text-[#00D4FF] shadow-[0_0_15px_rgba(0,212,255,0.2)]' 
-                        : 'text-slate-500 hover:bg-white/5 hover:text-slate-300'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-
-              {/* Chart Area */}
-              <div className="flex-1">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart 
-                    data={skillsDataMap[activeSkillTab]} 
-                    layout="vertical" 
-                    margin={{ top: 10, right: 30, left: 60, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#ffffff10" />
-                    <XAxis type="number" hide />
-                    <YAxis 
-                      dataKey="name" 
-                      type="category" 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fontSize: 10, fill: '#cbd5e1' }}
-                      width={100}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="value" fill="#00D4FF" radius={[0, 4, 4, 0]} barSize={20} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
           </ChartCard>
         </section>
 
