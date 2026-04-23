@@ -26,14 +26,15 @@ import {
   Cell, 
   Legend,
   AreaChart,
-  Area
+  Area,
+  LabelList
 } from 'recharts';
 import { ChartCard } from './components/ChartCard';
 import { MetricCard } from './components/MetricCard';
 
 // --- DATA DEFINITIONS ---
 
-const COLORS = ['#00D4FF', '#3B82F6', '#8B5CF6', '#EC4899', '#F59E0B', '#10B981', '#6366F1'];
+const COLORS = ['#00D4FF', '#4338CA', '#8B5CF6', '#10B981', '#F59E0B', '#F43F5E', '#06B6D4'];
 
 const genderData = [
   { name: '男', value: 72, percent: '56.3%' },
@@ -135,14 +136,16 @@ const hometownData = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-lg border border-white/10 bg-[#12121a]/90 p-3 backdrop-blur-md shadow-2xl">
-        <p className="mb-1 text-xs font-bold text-slate-300">{label}</p>
-        <div className="space-y-1">
+      <div className="rounded border border-[#00D4FF]/30 bg-[#0A0A10]/80 p-3 backdrop-blur-xl shadow-[0_0_20px_rgba(0,212,255,0.15)] transition-all">
+        <p className="mb-2 text-[11px] font-medium tracking-wide text-slate-400 uppercase">{label}</p>
+        <div className="space-y-2">
           {payload.map((entry: any, index: number) => (
-            <div key={index} className="flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
-              <span className="text-xs text-slate-400">{entry.name || '数值'}:</span>
-              <span className="text-xs font-bold text-white">{entry.value}</span>
+            <div key={index} className="flex items-center justify-between gap-6">
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: entry.color || entry.fill, boxShadow: `0 0 8px ${entry.color || entry.fill}` }} />
+                <span className="text-[11px] text-slate-300">{entry.name || '数值'}</span>
+              </div>
+              <span className="text-xs font-mono font-bold text-white tracking-wider">{entry.value}</span>
             </div>
           ))}
         </div>
@@ -162,53 +165,52 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#050506] p-6 text-white font-sans selection:bg-[#00D4FF]/30 overflow-x-hidden">
+    <div className="min-h-screen bg-[#0a0c10] p-6 text-slate-200 font-sans selection:bg-[#00D4FF]/30 overflow-x-hidden">
       {/* Background Decorative Elements */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-[#00D4FF]/5 to-transparent" />
-        <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#00D4FF]/10 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#8B5CF6]/5 blur-[120px] rounded-full" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+      <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(0,212,255,0.05),transparent)]">
+        <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[40%] bg-[#00D4FF]/10 blur-[140px] rounded-full mix-blend-screen" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#8B5CF6]/5 blur-[120px] rounded-full mix-blend-screen" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:48px_48px]" />
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-10 max-w-[1920px] mx-auto">
         {/* --- HEADER --- */}
-        <header className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <header className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between border-b border-white/5 pb-6">
           <div>
-            <h1 className="flex items-center gap-3 text-2xl font-bold tracking-tight">
-              <div className="h-8 w-1 bg-[#00D4FF] rounded-full" />
-              <span className="bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+            <h1 className="flex items-center gap-3 text-3xl font-bold tracking-tight">
+              <div className="h-8 w-1.5 rounded bg-gradient-to-b from-[#00D4FF] to-[#3B82F6] shadow-[0_0_15px_rgba(0,212,255,0.5)]" />
+              <span className="bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
                 人员结构分析驾驶舱
               </span>
-              <span className="rounded-full border border-[#00D4FF]/30 bg-[#00D4FF]/10 px-2 py-0.5 text-[10px] font-medium text-[#00D4FF] uppercase tracking-wider">
+              <span className="rounded border border-[#00D4FF]/20 bg-[#00D4FF]/10 px-2 py-0.5 text-[10px] font-semibold text-[#00D4FF] uppercase tracking-widest shadow-[inset_0_0_10px_rgba(0,212,255,0.1)]">
                 Enterprise
               </span>
             </h1>
-            <p className="mt-1 text-xs text-slate-500 flex items-center gap-2">
-              <Calendar size={12} />
-              <span>数据截止日期: 2026-12-31</span>
-              <span className="h-3 w-[1px] bg-slate-800" />
-              <span>{currentTime.toLocaleTimeString()}</span>
+            <p className="mt-3 text-[11px] font-mono text-slate-500 flex items-center gap-3 uppercase tracking-widest">
+              <Calendar size={14} className="text-[#00D4FF]" />
+              <span>截止日期: 2026-12-31</span>
+              <span className="h-3 w-[1px] bg-slate-700" />
+              <span className="text-[#00D4FF] drop-shadow-[0_0_5px_rgba(0,212,255,0.8)]">{currentTime.toLocaleTimeString()}</span>
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center gap-2 rounded-lg border border-white/5 bg-white/5 p-1">
-              <button className="rounded-md px-3 py-1.5 text-xs font-medium bg-[#00D4FF] text-[#050506]">全量部门</button>
-              <button className="rounded-md px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-all">研发中心</button>
-              <button className="rounded-md px-3 py-1.5 text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-all">营销部</button>
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-1 rounded-lg border border-slate-700/50 bg-[#161b22]/50 p-1 backdrop-blur-xl">
+              <button className="rounded px-4 py-1.5 text-xs font-semibold bg-[#00D4FF]/10 text-[#00D4FF] border border-[#00D4FF]/20 shadow-[inset_0_0_10px_rgba(0,212,255,0.1)]">全量部门</button>
+              <button className="rounded px-4 py-1.5 text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-all">研发中心</button>
+              <button className="rounded px-4 py-1.5 text-xs font-medium text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-all">营销部</button>
             </div>
             
             <div className="h-8 w-[1px] bg-slate-800 hidden md:block" />
             
-            <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:border-[#00D4FF]/50 transition-all">
+            <div className="flex items-center gap-3">
+              <button className="flex items-center gap-2 rounded-lg border border-slate-700/50 bg-[#161b22]/50 px-4 py-2 text-xs font-medium text-slate-300 hover:border-[#00D4FF]/30 hover:text-[#00D4FF] transition-all backdrop-blur-xl">
                 <Filter size={14} /> 筛选器
               </button>
-              <button className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-[#00D4FF]/10 hover:text-[#00D4FF] transition-all">
-                <Download size={14} /> 导出
+              <button className="flex items-center gap-2 rounded-lg border border-[#00D4FF]/30 bg-[#00D4FF]/10 px-4 py-2 text-xs font-medium text-[#00D4FF] shadow-[0_0_15px_rgba(0,212,255,0.15)] hover:bg-[#00D4FF]/20 transition-all backdrop-blur-xl">
+                <Download size={14} /> 导出报表
               </button>
-              <button className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-300 hover:bg-[#00D4FF]/10 hover:text-[#00D4FF] transition-all">
+              <button className="rounded-lg border border-slate-700/50 bg-[#161b22]/50 p-2 text-slate-400 hover:text-[#00D4FF] transition-all backdrop-blur-xl">
                 <Maximize size={16} />
               </button>
             </div>
@@ -264,18 +266,19 @@ export default function App() {
                 <Pie
                   data={genderData}
                   cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
+                  cy="45%"
+                  innerRadius={55}
+                  outerRadius={75}
+                  paddingAngle={6}
                   dataKey="value"
+                  stroke="rgba(255,255,255,0.05)"
+                  strokeWidth={2}
                 >
-                  {genderData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
+                  <Cell fill="#00D4FF" />
+                  <Cell fill="#F43F5E" />
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs text-slate-400">{value}</span>} />
+                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs tracking-wider text-slate-400">{value}</span>} />
               </PieChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -283,12 +286,20 @@ export default function App() {
           {/* 2. 年龄分布 */}
           <ChartCard title="年龄阶梯分布">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ageData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="value" fill="#00D4FF" radius={[4, 4, 0, 0]} barSize={30} />
+              <BarChart data={ageData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="barCyan" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.8}/>
+                    <stop offset="100%" stopColor="#00D4FF" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tickMargin={8} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis axisLine={false} tickLine={false} tickMargin={8} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} content={<CustomTooltip />} />
+                <Bar dataKey="value" fill="url(#barCyan)" radius={[4, 4, 0, 0]} barSize={24}>
+                  <LabelList dataKey="value" position="top" fill="#94a3b8" fontSize={10} fontFamily="monospace" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -300,18 +311,20 @@ export default function App() {
                 <Pie
                   data={educationData}
                   cx="50%"
-                  cy="50%"
-                  innerRadius={0}
-                  outerRadius={80}
-                  labelLine={false}
+                  cy="45%"
+                  innerRadius={50}
+                  outerRadius={75}
+                  paddingAngle={4}
                   dataKey="value"
+                  stroke="rgba(255,255,255,0.05)"
+                  strokeWidth={2}
                 >
                   {educationData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs text-slate-400">{value}</span>} />
+                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-[11px] tracking-wider text-slate-400">{value}</span>} />
               </PieChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -319,12 +332,20 @@ export default function App() {
           {/* 4. 员工工龄分布 */}
           <ChartCard title="员工工龄分布">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={workingAgeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="value" fill="#8B5CF6" radius={[4, 4, 0, 0]} barSize={30} />
+              <BarChart data={workingAgeData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="barPurple" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.8}/>
+                    <stop offset="100%" stopColor="#8B5CF6" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tickMargin={8} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis axisLine={false} tickLine={false} tickMargin={8} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} content={<CustomTooltip />} />
+                <Bar dataKey="value" fill="url(#barPurple)" radius={[4, 4, 0, 0]} barSize={24}>
+                  <LabelList dataKey="value" position="top" fill="#94a3b8" fontSize={10} fontFamily="monospace" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -335,15 +356,15 @@ export default function App() {
               <AreaChart data={tenureData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorTenure" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                    <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.4}/>
+                    <stop offset="100%" stopColor="#00D4FF" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tickMargin={8} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis axisLine={false} tickLine={false} tickMargin={8} tick={{ fontSize: 10, fill: '#64748b' }} />
                 <Tooltip content={<CustomTooltip />} />
-                <Area type="monotone" dataKey="value" stroke="#8B5CF6" fillOpacity={1} fill="url(#colorTenure)" strokeWidth={2} />
+                <Area type="monotone" dataKey="value" stroke="#00D4FF" fillOpacity={1} fill="url(#colorTenure)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -357,16 +378,18 @@ export default function App() {
                   cx="50%"
                   cy="45%"
                   innerRadius={50}
-                  outerRadius={70}
-                  paddingAngle={2}
+                  outerRadius={75}
+                  paddingAngle={4}
                   dataKey="value"
+                  stroke="rgba(255,255,255,0.05)"
+                  strokeWidth={2}
                 >
                   {politicalData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs text-slate-400">{value}</span>} />
+                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-[11px] tracking-wider text-slate-400">{value}</span>} />
               </PieChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -374,12 +397,20 @@ export default function App() {
           {/* 7. 用工类型 */}
           <ChartCard title="用工类型">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={employmentData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#64748b' }} />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="value" fill="#10B981" radius={[4, 4, 0, 0]} barSize={40} />
+              <BarChart data={employmentData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="barEmerald" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10B981" stopOpacity={0.8}/>
+                    <stop offset="100%" stopColor="#10B981" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tickMargin={8} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <YAxis axisLine={false} tickLine={false} tickMargin={8} tick={{ fontSize: 10, fill: '#64748b' }} />
+                <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} content={<CustomTooltip />} />
+                <Bar dataKey="value" fill="url(#barEmerald)" radius={[4, 4, 0, 0]} barSize={28}>
+                  <LabelList dataKey="value" position="top" fill="#94a3b8" fontSize={10} fontFamily="monospace" />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -391,18 +422,20 @@ export default function App() {
                 <Pie
                   data={frontLinePieData}
                   cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
+                  cy="45%"
+                  innerRadius={55}
+                  outerRadius={75}
+                  paddingAngle={6}
                   dataKey="value"
+                  stroke="rgba(255,255,255,0.05)"
+                  strokeWidth={2}
                 >
                   {frontLinePieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={index === 0 ? '#3B82F6' : '#1e293b'} />
+                    <Cell key={`cell-${index}`} fill={index === 0 ? '#00D4FF' : '#1e293b'} />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs text-slate-400">{value}</span>} />
+                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-[11px] tracking-wider text-slate-400">{value}</span>} />
               </PieChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -414,18 +447,20 @@ export default function App() {
                 <Pie
                   data={positionData}
                   cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={8}
+                  cy="45%"
+                  innerRadius={50}
+                  outerRadius={75}
+                  paddingAngle={4}
                   dataKey="value"
+                  stroke="rgba(255,255,255,0.05)"
+                  strokeWidth={2}
                 >
                   {positionData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[(index + 3) % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs text-slate-400">{value}</span>} />
+                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-[11px] tracking-wider text-slate-400">{value}</span>} />
               </PieChart>
             </ResponsiveContainer>
           </ChartCard>
@@ -433,15 +468,15 @@ export default function App() {
           {/* 10. 职称、职业资格、职业技能结构分布 */}
           <ChartCard title="职称、职业资格、职业技能结构分布" className="md:col-span-2">
             <div className="flex h-full w-full gap-4">
-              <div className="flex w-24 shrink-0 flex-col justify-center gap-2 border-r border-white/10 pr-4">
+              <div className="flex w-24 shrink-0 flex-col justify-center gap-2 border-r border-white/5 pr-4">
                 {['全部', '职称', '职业资格', '职业技能'].map(tab => (
                   <button 
                     key={tab}
                     onClick={() => setActiveStructureTab(tab)}
-                    className={`rounded-md px-3 py-2 text-left text-xs transition-all ${
+                    className={`relative overflow-hidden rounded px-3 py-2 text-left text-xs transition-all duration-300 ${
                       activeStructureTab === tab 
-                        ? 'bg-[#00D4FF]/20 text-[#00D4FF] border border-[#00D4FF]/50' 
-                        : 'border border-transparent text-slate-400 hover:bg-white/5'
+                        ? 'bg-gradient-to-r from-[#00D4FF]/20 to-transparent text-[#00D4FF] border-l-2 border-[#00D4FF] font-medium' 
+                        : 'border-l-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5'
                     }`}
                   >
                     {tab}
@@ -453,20 +488,28 @@ export default function App() {
                   <BarChart 
                     data={structureData[activeStructureTab]} 
                     layout="vertical" 
-                    margin={{ top: 10, right: 30, left: 10, bottom: 5 }}
+                    margin={{ top: 10, right: 40, left: 10, bottom: 5 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#ffffff10" />
+                    <defs>
+                      <linearGradient id="barCyanHoriz" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.2}/>
+                        <stop offset="100%" stopColor="#00D4FF" stopOpacity={1}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.03)" />
                     <XAxis type="number" hide />
                     <YAxis 
                       dataKey="name" 
                       type="category" 
                       axisLine={false} 
                       tickLine={false} 
-                      tick={{ fontSize: 10, fill: '#cbd5e1' }}
+                      tick={{ fontSize: 10, fill: '#94a3b8' }}
                       width={80}
                     />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="value" fill="#00D4FF" radius={[0, 4, 4, 0]} barSize={20} />
+                    <Tooltip cursor={{ fill: 'rgba(255,255,255,0.02)' }} content={<CustomTooltip />} />
+                    <Bar dataKey="value" fill="url(#barCyanHoriz)" radius={[0, 4, 4, 0]} barSize={16}>
+                      <LabelList dataKey="value" position="right" fill="#cbd5e1" fontSize={10} fontFamily="monospace" />
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -480,24 +523,28 @@ export default function App() {
                 <Pie
                   data={hometownData}
                   cx="50%"
-                  cy="50%"
-                  outerRadius={80}
+                  cy="45%"
+                  innerRadius={50}
+                  outerRadius={75}
+                  paddingAngle={4}
                   dataKey="value"
-                  stroke="none"
+                  stroke="rgba(255,255,255,0.05)"
+                  strokeWidth={2}
                 >
                   {hometownData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[(index + 5) % COLORS.length]} />
                   ))}
                 </Pie>
                 <Tooltip content={<CustomTooltip />} />
-                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs text-slate-400">{value}</span>} />
+                <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-[11px] tracking-wider text-slate-400">{value}</span>} />
               </PieChart>
             </ResponsiveContainer>
           </ChartCard>
         </section>
 
         {/* --- FOOTER DECORATION --- */}
-        <footer className="mt-8 pb-4 text-center text-[10px] text-slate-600 uppercase tracking-[0.2em]">
+        <footer className="mt-12 pb-6 text-center text-[10px] text-slate-500 uppercase tracking-[0.3em] opacity-50 flex flex-col items-center gap-2">
+          <div className="w-24 h-[1px] bg-gradient-to-r from-transparent via-slate-500 to-transparent"></div>
           Figma Make HRMS Engine v4.0 • Enterprise Edition • Secure Data Tunnel Active
         </footer>
       </div>
