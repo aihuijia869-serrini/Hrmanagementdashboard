@@ -6,15 +6,23 @@ interface ChartCardProps {
   title: string;
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
-export const ChartCard: React.FC<ChartCardProps> = ({ title, children, className = "" }) => {
+export const ChartCard: React.FC<ChartCardProps> = ({ title, children, className = "", onClick }) => {
+  // Extract flex direction from className if present, otherwise default to flex-col
+  const hasFlexRow = className.includes('flex-row');
+  const flexDirection = hasFlexRow ? 'flex-row' : 'flex-col';
+  // Remove any flex-row or flex-col from className to avoid conflicts
+  const cleanClassName = className.replace(/flex-(row|col)/g, '').trim();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -4, boxShadow: '0 10px 30px -10px rgba(0, 212, 255, 0.15)' }}
-      className={`group relative overflow-hidden rounded-xl border border-slate-700/50 bg-gradient-to-b from-[#161b22]/90 to-[#0d1117]/90 p-5 backdrop-blur-xl transition-all duration-300 ${className}`}
+      onClick={onClick}
+      className={`group relative overflow-hidden rounded-xl border border-slate-700/50 bg-gradient-to-b from-[#161b22]/90 to-[#0d1117]/90 p-5 backdrop-blur-xl transition-all duration-300 flex ${flexDirection} h-[320px] ${onClick ? 'cursor-pointer' : ''} ${cleanClassName}`}
       style={{
         boxShadow: 'inset 0 1px 0 0 rgba(255, 255, 255, 0.05)',
       }}
@@ -40,7 +48,7 @@ export const ChartCard: React.FC<ChartCardProps> = ({ title, children, className
         </div>
       </div>
       
-      <div className="relative z-10 h-[240px] w-full">
+      <div className="relative z-10 flex-1 min-h-0 w-full">
         {children}
       </div>
     </motion.div>
