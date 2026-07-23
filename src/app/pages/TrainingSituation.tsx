@@ -86,7 +86,7 @@ export const TrainingSituation = () => {
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-2 flex-1">
         <ChartCard title="各部门培训人次与学时统计" className="lg:col-span-1 h-[350px]">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <ComposedChart key="dept-training-composed" data={deptTrainingData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+            <ComposedChart accessibilityLayer={false} data={deptTrainingData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="barBlue" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.8}/>
@@ -153,7 +153,7 @@ export const TrainingSituation = () => {
             <div className="w-1/4 h-full flex flex-col items-center justify-center border-r border-white/5 pr-4 relative">
               <ResponsiveContainer width="100%" height={150}>
                 <RadialBarChart
-                  key="completion-radial"
+                 
                   cx="50%" cy="50%" innerRadius="70%" outerRadius="100%" data={radialData} startAngle={90} endAngle={-270}
                 >
                   <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
@@ -168,7 +168,7 @@ export const TrainingSituation = () => {
 
             <div className="w-3/4 h-full">
               <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-                <LineChart key="completion-trend-line" data={completionTrendData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                <LineChart accessibilityLayer={false} data={completionTrendData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tickMargin={10} tick={{ fontSize: 11, fill: '#64748b' }} />
                   <YAxis yAxisId="left" axisLine={false} tickLine={false} tickMargin={10} tick={{ fontSize: 11, fill: '#64748b' }} />

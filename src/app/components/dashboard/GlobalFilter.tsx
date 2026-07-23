@@ -69,36 +69,36 @@ export function GlobalFilter() {
 
   if (!mounted) {
     return (
-      <div className="bg-white/90 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-200 dark:border-[#165DFF]/20 px-6 py-4 flex items-center justify-center h-20">
+      <div className="bg-white/80 dark:bg-[#0B1121]/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-[#165DFF]/20 px-6 py-4 flex items-center justify-center h-20">
         <div className="text-sm text-slate-400">加载中...</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white/90 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-200 dark:border-[#165DFF]/20 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)] relative transition-colors duration-300">
+    <div className="bg-white/80 dark:bg-[#0B1121]/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-[#165DFF]/20 px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4 shadow-[0_4px_24px_rgba(0,0,0,0.02)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.2)] relative z-30 transition-colors duration-300">
       {/* Tech line indicator (Dark mode only) */}
-      <div className="hidden dark:block absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-transparent via-[#165DFF] to-transparent w-full opacity-50"></div>
+      <div className="hidden dark:block absolute bottom-0 left-0 h-[1px] bg-gradient-to-r from-transparent via-[#00D4FF]/50 to-transparent w-full"></div>
 
       <div className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-50 dark:bg-[#165DFF]/10 border border-blue-100 dark:border-[#165DFF]/30">
-          <Building2 className="w-5 h-5 text-[#165DFF]" />
+        <div className="flex items-center justify-center w-8 h-8 rounded bg-gradient-to-br from-[#165DFF]/20 to-[#00D4FF]/20 border border-[#165DFF]/30 dark:border-[#00D4FF]/30">
+          <Building2 className="w-4 h-4 text-[#165DFF] dark:text-[#00D4FF]" />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-slate-800 dark:text-white tracking-wide">
-            人力数据驾驶舱 <span className="text-[#165DFF] ml-2 text-lg">|</span> <span className="text-slate-500 dark:text-slate-400 text-base font-normal ml-2">总览大屏</span>
+          <h1 className="text-base font-bold text-slate-800 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-slate-300 tracking-wide">
+            人力数据驾驶舱 <span className="text-[#165DFF] dark:text-[#00D4FF] ml-2">|</span> <span className="text-slate-500 dark:text-slate-400 font-normal ml-2">总览大屏</span>
           </h1>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         {/* Org Selector */}
-        <div className="flex items-center bg-slate-50 dark:bg-[#1e293b]/60 border border-slate-200 dark:border-[#334155] rounded-md px-3 py-1.5 hover:border-[#165DFF]/50 transition-colors cursor-pointer">
-          <span className="text-sm text-slate-500 dark:text-slate-400 mr-2">组织:</span>
+        <div className="flex items-center bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-[#165DFF]/20 rounded px-3 py-1.5 hover:border-[#165DFF]/50 transition-all cursor-pointer shadow-inner">
+          <span className="text-[13px] text-slate-500 dark:text-slate-400 mr-2">组织:</span>
           <select 
             value={org}
             onChange={(e) => handleFilterChange(setOrg, e.target.value)}
-            className="bg-transparent text-slate-700 dark:text-white text-sm outline-none appearance-none cursor-pointer pr-4"
+            className="bg-transparent text-slate-700 dark:text-slate-200 text-[13px] outline-none appearance-none cursor-pointer pr-4 font-medium"
           >
             <option value="集团总部">集团总部</option>
             <option value="华东分公司">华东分公司</option>
@@ -107,12 +107,12 @@ export function GlobalFilter() {
         </div>
 
         {/* Time Selector */}
-        <div className="flex items-center bg-slate-50 dark:bg-[#1e293b]/60 border border-slate-200 dark:border-[#334155] rounded-md px-3 py-1.5 hover:border-[#165DFF]/50 transition-colors cursor-pointer">
-          <Calendar className="w-4 h-4 text-[#165DFF] mr-2" />
+        <div className="flex items-center bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-[#165DFF]/20 rounded px-3 py-1.5 hover:border-[#165DFF]/50 transition-all cursor-pointer shadow-inner">
+          <Calendar className="w-3.5 h-3.5 text-[#165DFF] dark:text-[#00D4FF]/80 mr-2" />
           <select 
             value={period}
             onChange={(e) => handleFilterChange(setPeriod, e.target.value)}
-            className="bg-transparent text-slate-700 dark:text-white text-sm outline-none appearance-none cursor-pointer pr-4"
+            className="bg-transparent text-slate-700 dark:text-slate-200 text-[13px] outline-none appearance-none cursor-pointer pr-4 font-medium"
           >
             <option value="2026年度">2026年度</option>
             <option value="2026年Q1">2026年Q1</option>
@@ -120,46 +120,46 @@ export function GlobalFilter() {
           </select>
         </div>
 
-        <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 mx-1"></div>
+        <div className="w-px h-5 bg-slate-200 dark:bg-white/10 mx-1"></div>
 
         {/* Action Buttons */}
         <button 
           onClick={triggerRefresh}
-          className="flex items-center justify-center p-2 rounded-md bg-slate-50 dark:bg-[#1e293b]/60 border border-slate-200 dark:border-[#334155] text-slate-600 dark:text-slate-300 hover:text-[#165DFF] dark:hover:text-white hover:border-[#165DFF] hover:bg-blue-50 dark:hover:bg-[#165DFF]/10 transition-all group" 
+          className="flex items-center justify-center p-1.5 rounded bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-[#165DFF]/20 text-slate-600 dark:text-slate-400 hover:text-[#165DFF] dark:hover:text-[#00D4FF] hover:border-[#165DFF] hover:bg-blue-50 dark:hover:bg-[#165DFF]/10 transition-all group shadow-sm" 
           title="刷新数据"
         >
-          <RefreshCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
+          <RefreshCcw className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-500" />
         </button>
         <button 
           onClick={() => triggerRefresh()}
-          className="flex items-center justify-center p-2 rounded-md bg-slate-50 dark:bg-[#1e293b]/60 border border-slate-200 dark:border-[#334155] text-slate-600 dark:text-slate-300 hover:text-[#165DFF] dark:hover:text-white hover:border-[#165DFF] hover:bg-blue-50 dark:hover:bg-[#165DFF]/10 transition-all" 
+          className="flex items-center justify-center p-1.5 rounded bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-[#165DFF]/20 text-slate-600 dark:text-slate-400 hover:text-[#165DFF] dark:hover:text-[#00D4FF] hover:border-[#165DFF] hover:bg-blue-50 dark:hover:bg-[#165DFF]/10 transition-all shadow-sm" 
           title="重置维度"
         >
-          <Filter className="w-4 h-4" />
+          <Filter className="w-3.5 h-3.5" />
         </button>
         <button
           onClick={handleExportReport}
-          className="flex items-center justify-center p-2 rounded-md bg-slate-50 dark:bg-[#1e293b]/60 border border-slate-200 dark:border-[#334155] text-slate-600 dark:text-slate-300 hover:text-[#165DFF] dark:hover:text-white hover:border-[#165DFF] hover:bg-blue-50 dark:hover:bg-[#165DFF]/10 transition-all"
+          className="flex items-center justify-center p-1.5 rounded bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-[#165DFF]/20 text-slate-600 dark:text-slate-400 hover:text-[#165DFF] dark:hover:text-[#00D4FF] hover:border-[#165DFF] hover:bg-blue-50 dark:hover:bg-[#165DFF]/10 transition-all shadow-sm"
           title="导出报告"
         >
-          <Download className="w-4 h-4" />
+          <Download className="w-3.5 h-3.5" />
         </button>
         
         {/* Theme Toggle */}
         <button 
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="flex items-center justify-center p-2 rounded-md bg-slate-50 dark:bg-[#1e293b]/60 border border-slate-200 dark:border-[#334155] text-slate-600 dark:text-slate-300 hover:text-[#165DFF] dark:hover:text-white hover:border-[#165DFF] hover:bg-blue-50 dark:hover:bg-[#165DFF]/10 transition-all" 
+          className="flex items-center justify-center p-1.5 rounded bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-[#165DFF]/20 text-slate-600 dark:text-slate-400 hover:text-[#165DFF] dark:hover:text-[#00D4FF] hover:border-[#165DFF] hover:bg-blue-50 dark:hover:bg-[#165DFF]/10 transition-all shadow-sm" 
           title="切换主题"
         >
-          {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          {theme === 'dark' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
         </button>
 
         <button 
           onClick={toggleFullscreen}
-          className="flex items-center justify-center p-2 rounded-md bg-[#165DFF] text-white hover:bg-[#165DFF]/90 shadow-md dark:shadow-[0_0_10px_rgba(22,93,255,0.4)] transition-all border border-[#165DFF]" 
+          className="flex items-center justify-center p-1.5 rounded bg-gradient-to-r from-[#165DFF] to-[#00D4FF] text-white hover:from-[#165DFF] hover:to-[#14C9C9] shadow-[0_0_10px_rgba(22,93,255,0.4)] hover:shadow-[0_0_15px_rgba(22,93,255,0.6)] transition-all border border-transparent" 
           title={isFullscreen ? "退出全屏" : "全屏模式"}
         >
-          {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+          {isFullscreen ? <Minimize className="w-3.5 h-3.5" /> : <Maximize className="w-3.5 h-3.5" />}
         </button>
       </div>
     </div>

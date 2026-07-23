@@ -45,7 +45,7 @@ export function TurnoverModule({ onClick }: { onClick: (t: string) => void }) {
           </div>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%" minHeight={120}>
-              <LineChart key="turnover-trend-chart" data={turnoverTrend} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+              <LineChart accessibilityLayer={false} data={turnoverTrend} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                 <XAxis dataKey="month" tick={{ fill: textColor, fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: textColor, fontSize: 9 }} axisLine={false} tickLine={false} />
@@ -63,7 +63,7 @@ export function TurnoverModule({ onClick }: { onClick: (t: string) => void }) {
         <div className="h-[45%] min-h-[140px] flex items-center bg-slate-50 dark:bg-white/5 rounded-lg p-2 cursor-pointer border border-slate-100 dark:border-white/5 hover:border-slate-200 dark:hover:border-white/10 transition-colors">
           <div className="w-[45%] h-full relative min-h-[100px]">
             <ResponsiveContainer width="100%" height="100%" minHeight={80}>
-              <PieChart key="turnover-reasons-pie">
+              <PieChart accessibilityLayer={false}>
                 <Pie data={reasonData} cx="50%" cy="50%" innerRadius={15} outerRadius={30} paddingAngle={2} dataKey="value" stroke="none">
                   {reasonData.map((entry, index) => <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>

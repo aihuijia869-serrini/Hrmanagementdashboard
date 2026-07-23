@@ -46,7 +46,7 @@ export function KeyWarningsModule({ onClick }: { onClick: (t: string) => void })
           </div>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-              <BarChart key="warning-types-bar" data={warningTypes} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
+              <BarChart accessibilityLayer={false} data={warningTypes} layout="vertical" margin={{ top: 0, right: 20, left: 0, bottom: 0 }}>
                 <XAxis type="number" hide />
                 <YAxis dataKey="type" type="category" tick={{ fill: textColor, fontSize: 10 }} axisLine={false} tickLine={false} width={80} />
                 <Tooltip
@@ -68,7 +68,7 @@ export function KeyWarningsModule({ onClick }: { onClick: (t: string) => void })
            <h4 className="text-xs text-slate-700 dark:text-slate-300 mb-2">预警数量趋势图</h4>
            <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-              <LineChart key="warning-trend-line" data={warningTrend} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+              <LineChart accessibilityLayer={false} data={warningTrend} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
                 <XAxis dataKey="month" tick={{ fill: textColor, fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: textColor, fontSize: 10 }} axisLine={false} tickLine={false} />

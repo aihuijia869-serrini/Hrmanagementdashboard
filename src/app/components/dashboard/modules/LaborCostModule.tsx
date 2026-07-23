@@ -37,7 +37,7 @@ export function LaborCostModule({ onClick }: { onClick: (t: string) => void }) {
         <div className="h-1/2 min-h-[150px] flex items-center">
           <div className="w-1/2 h-full relative cursor-pointer">
             <ResponsiveContainer width="100%" height="100%" minHeight={100}>
-              <PieChart key="labor-cost-composition">
+              <PieChart accessibilityLayer={false}>
                 <Pie data={costData} innerRadius={25} outerRadius={45} paddingAngle={2} dataKey="value" stroke="none">
                   {costData.map((entry, index) => <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
@@ -63,7 +63,7 @@ export function LaborCostModule({ onClick }: { onClick: (t: string) => void }) {
           <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">月度成本趋势 (万)</div>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%" minHeight={100}>
-              <LineChart key="labor-cost-trend" data={trendData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+              <LineChart accessibilityLayer={false} data={trendData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                 <XAxis dataKey="month" tick={{ fill: textColor, fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: textColor, fontSize: 9 }} axisLine={false} tickLine={false} />
                 <Tooltip

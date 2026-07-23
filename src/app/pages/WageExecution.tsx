@@ -104,7 +104,7 @@ export const WageExecution = () => {
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-2 flex-1">
         <ChartCard title="工资总额执行走势" className="lg:col-span-1 h-[350px]">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <AreaChart key="wage-execution-area" data={trendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+            <AreaChart accessibilityLayer={false} data={trendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="areaCurrent" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.3}/>

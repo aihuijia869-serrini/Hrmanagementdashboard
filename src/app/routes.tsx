@@ -6,6 +6,7 @@ import { LaborCost } from "./pages/LaborCost";
 import { PersonnelTurnover } from "./pages/PersonnelTurnover";
 import { WageExecution } from "./pages/WageExecution";
 import { TrainingSituation } from "./pages/TrainingSituation";
+import { BudgetMonitor } from "./pages/BudgetMonitor";
 
 // Dummy page for routes that haven't been built yet
 function DummyPage({ title }: { title: string }) {
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
       { path: "turnover", Component: PersonnelTurnover },
       { path: "salary", Component: WageExecution },
       { path: "training", Component: TrainingSituation },
+      { path: "budget", Component: BudgetMonitor },
       { path: "warnings", Component: () => <DummyPage title="关键预警明细详情页" /> },
       { path: "*", Component: () => <DummyPage title="页面建设中 (404 Not Found)" /> },
     ],

@@ -38,7 +38,7 @@ export function SalaryExecutionModule({ onClick }: { onClick: (t: string) => voi
           </div>
           <div className="w-40 h-40 relative mt-4 min-h-[160px]">
             <ResponsiveContainer width="100%" height="100%" minHeight={160}>
-              <PieChart key="salary-exec-donut">
+              <PieChart accessibilityLayer={false}>
                 <Pie
                   data={[{ id: 'exec-filled', value: currentExec }, { id: 'exec-empty', value: 100 - currentExec }]}
                   cx="50%" cy="50%"
@@ -47,8 +47,8 @@ export function SalaryExecutionModule({ onClick }: { onClick: (t: string) => voi
                   dataKey="value"
                   stroke="none"
                 >
-                  <Cell key="salary-exec-filled" fill="#FF7D00" />
-                  <Cell key="salary-exec-empty" fill={emptyCellColor} />
+                  <Cell fill="#FF7D00" />
+                  <Cell fill={emptyCellColor} />
                 </Pie>
               </PieChart>
             </ResponsiveContainer>
@@ -81,7 +81,7 @@ export function SalaryExecutionModule({ onClick }: { onClick: (t: string) => voi
           </div>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-              <AreaChart key="salary-exec-trend" data={execTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart accessibilityLayer={false} data={execTrendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorRate" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#FF7D00" stopOpacity={isDark ? 0.3 : 0.15}/>

@@ -46,7 +46,7 @@ export function PersonnelStructureModule({ onClick }: { onClick: (t: string) => 
           <h4 className="text-xs text-slate-500 dark:text-slate-400 mb-2 text-center">学历分布饼图</h4>
           <div className="flex-1 relative min-h-0">
             <ResponsiveContainer width="100%" height="100%" minHeight={180}>
-              <PieChart key="edu-distribution-pie">
+              <PieChart accessibilityLayer={false}>
                 <Pie data={eduData} innerRadius={0} outerRadius={65} dataKey="value" stroke="none">
                   {eduData.map((entry, index) => <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
@@ -64,7 +64,7 @@ export function PersonnelStructureModule({ onClick }: { onClick: (t: string) => 
           <h4 className="text-xs text-slate-500 dark:text-slate-400 mb-2 text-center">年龄段直方图</h4>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%" minHeight={180}>
-              <BarChart key="age-distribution-bar" data={ageData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <BarChart accessibilityLayer={false} data={ageData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <XAxis dataKey="age" tick={{ fill: textColor, fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: textColor, fontSize: 10 }} axisLine={false} tickLine={false} />
                 <Tooltip
@@ -83,7 +83,7 @@ export function PersonnelStructureModule({ onClick }: { onClick: (t: string) => 
           <h4 className="text-xs text-slate-500 dark:text-slate-400 mb-2 text-center">性别结构环形图</h4>
           <div className="flex-1 relative min-h-0">
             <ResponsiveContainer width="100%" height="100%" minHeight={180}>
-              <PieChart key="gender-distribution-donut">
+              <PieChart accessibilityLayer={false}>
                 <Pie data={genderData} innerRadius={45} outerRadius={65} paddingAngle={5} dataKey="value" stroke="none">
                   {genderData.map((entry, index) => <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>

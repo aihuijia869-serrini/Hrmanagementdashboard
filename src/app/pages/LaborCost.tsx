@@ -83,7 +83,7 @@ export const LaborCost = () => {
         <ChartCard title="成本构成分析 (饼图+柱状)" className="lg:col-span-1">
           <div className="flex h-full w-full items-center gap-4">
             <ResponsiveContainer width="50%" height="100%">
-              <PieChart key="cost-composition-pie">
+              <PieChart accessibilityLayer={false}>
                 <Pie data={costCompositionPie} cx="50%" cy="50%" innerRadius={40} outerRadius={70} paddingAngle={4} dataKey="value" stroke="rgba(255,255,255,0.05)" strokeWidth={2}>
                   {costCompositionPie.map((entry, index) => <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />)}
                 </Pie>
@@ -91,7 +91,7 @@ export const LaborCost = () => {
               </PieChart>
             </ResponsiveContainer>
             <ResponsiveContainer width="50%" height="100%">
-              <BarChart key="cost-composition-bar" data={costCompositionPie} layout="vertical" margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+              <BarChart accessibilityLayer={false} data={costCompositionPie} layout="vertical" margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
                 <defs>
                   <linearGradient id="barCost" x1="0" y1="0" x2="1" y2="0">
                     <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.2}/>
@@ -111,7 +111,7 @@ export const LaborCost = () => {
 
         <ChartCard title="维度统计分析 (按部门)" className="lg:col-span-1">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <BarChart key="dept-cost-bar" data={deptCostData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+            <BarChart accessibilityLayer={false} data={deptCostData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="barCyan2" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.8}/>
@@ -131,7 +131,7 @@ export const LaborCost = () => {
 
         <ChartCard title="成本与经营指标联动趋势分析" className="lg:col-span-2 h-[350px]">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <ComposedChart key="cost-trend-composed" data={costTrendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+            <ComposedChart accessibilityLayer={false} data={costTrendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="areaCost" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.3}/>

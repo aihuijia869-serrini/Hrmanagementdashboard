@@ -94,7 +94,7 @@ export const PersonnelTurnover = () => {
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-2 flex-1">
         <ChartCard title="整体变动趋势" className="lg:col-span-2 h-[350px]">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <LineChart key="turnover-trend-line" data={turnoverTrendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+            <LineChart accessibilityLayer={false} data={turnoverTrendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tickMargin={10} tick={{ fontSize: 11, fill: '#64748b' }} />
               <YAxis axisLine={false} tickLine={false} tickMargin={10} tick={{ fontSize: 11, fill: '#64748b' }} />
@@ -111,7 +111,7 @@ export const PersonnelTurnover = () => {
 
         <ChartCard title="离职人数分布 (按部门)">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <BarChart key="dept-turnover-bar" data={deptTurnoverData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+            <BarChart accessibilityLayer={false} data={deptTurnoverData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="barRed" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#F43F5E" stopOpacity={0.8}/>
@@ -131,7 +131,7 @@ export const PersonnelTurnover = () => {
 
         <ChartCard title="离职原因构成">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <PieChart key="reason-distribution-pie">
+            <PieChart accessibilityLayer={false}>
               <Pie data={reasonPieData} cx="50%" cy="45%" innerRadius={50} outerRadius={75} paddingAngle={4} dataKey="value" stroke="rgba(255,255,255,0.05)" strokeWidth={2}>
                 {reasonPieData.map((entry, index) => <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
@@ -143,7 +143,7 @@ export const PersonnelTurnover = () => {
 
         <ChartCard title="留存与流失趋势" className="lg:col-span-2 h-[300px]">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <LineChart key="retention-trend-line" data={retentionTrendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+            <LineChart accessibilityLayer={false} data={retentionTrendData} margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tickMargin={10} tick={{ fontSize: 11, fill: '#64748b' }} />
               <YAxis yAxisId="left" domain={[80, 100]} axisLine={false} tickLine={false} tickMargin={10} tick={{ fontSize: 11, fill: '#64748b' }} />

@@ -153,10 +153,10 @@ export const PersonnelStructure = () => {
       <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 flex-1">
         <ChartCard title="性别结构分布">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <PieChart key="gender-distribution-pie">
+            <PieChart accessibilityLayer={false}>
               <Pie data={genderData} cx="50%" cy="45%" innerRadius={55} outerRadius={75} paddingAngle={6} dataKey="value" stroke="rgba(255,255,255,0.05)" strokeWidth={2}>
-                <Cell key="gender-cell-male" fill="#00D4FF" />
-                <Cell key="gender-cell-female" fill="#F43F5E" />
+                <Cell fill="#00D4FF" />
+                <Cell fill="#F43F5E" />
               </Pie>
               <Tooltip content={<CustomTooltip />} />
               <Legend verticalAlign="bottom" height={36} formatter={(value) => <span className="text-xs tracking-wider text-slate-400">{value}</span>} />
@@ -166,7 +166,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="年龄阶梯分布">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <BarChart key="age-distribution-bar" data={ageData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+            <BarChart accessibilityLayer={false} data={ageData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="barCyan" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.8}/>
@@ -186,7 +186,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="学历资质构成">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <PieChart key="education-distribution-pie">
+            <PieChart accessibilityLayer={false}>
               <Pie data={educationData} cx="50%" cy="45%" innerRadius={50} outerRadius={75} paddingAngle={4} dataKey="value" stroke="rgba(255,255,255,0.05)" strokeWidth={2}>
                 {educationData.map((entry, index) => <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
@@ -198,7 +198,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="员工工龄分布">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <BarChart key="working-age-distribution-bar" data={workingAgeData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+            <BarChart accessibilityLayer={false} data={workingAgeData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="barPurple" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#8B5CF6" stopOpacity={0.8}/>
@@ -218,7 +218,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="员工司龄分布">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <AreaChart key="tenure-distribution-area" data={tenureData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+            <AreaChart accessibilityLayer={false} data={tenureData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorTenure" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.4}/>
@@ -236,7 +236,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="政治面貌统计">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <PieChart key="political-distribution-pie">
+            <PieChart accessibilityLayer={false}>
               <Pie data={politicalData} cx="50%" cy="45%" innerRadius={50} outerRadius={75} paddingAngle={4} dataKey="value" stroke="rgba(255,255,255,0.05)" strokeWidth={2}>
                 {politicalData.map((entry, index) => <Cell key={entry.id} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
@@ -248,7 +248,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="用工类型">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <BarChart key="employment-type-bar" data={employmentData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+            <BarChart accessibilityLayer={false} data={employmentData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="barEmerald" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor="#10B981" stopOpacity={0.8}/>
@@ -268,7 +268,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="一线岗位人员占比">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <PieChart key="frontline-distribution-pie">
+            <PieChart accessibilityLayer={false}>
               <Pie data={frontLinePieData} cx="50%" cy="45%" innerRadius={55} outerRadius={75} paddingAngle={6} dataKey="value" stroke="rgba(255,255,255,0.05)" strokeWidth={2}>
                 {frontLinePieData.map((entry, index) => <Cell key={entry.id} fill={index === 0 ? '#00D4FF' : '#1e293b'} />)}
               </Pie>
@@ -280,7 +280,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="岗位序列组成">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <PieChart key="position-distribution-pie">
+            <PieChart accessibilityLayer={false}>
               <Pie data={positionData} cx="50%" cy="45%" innerRadius={50} outerRadius={75} paddingAngle={4} dataKey="value" stroke="rgba(255,255,255,0.05)" strokeWidth={2}>
                 {positionData.map((entry, index) => <Cell key={entry.id} fill={COLORS[(index + 3) % COLORS.length]} />)}
               </Pie>
@@ -309,7 +309,7 @@ export const PersonnelStructure = () => {
             </div>
             <div className="flex-1 min-w-0">
               <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-                <BarChart key="structure-qualification-bar" data={structureData[activeStructureTab]} layout="vertical" margin={{ top: 10, right: 40, left: 10, bottom: 5 }}>
+                <BarChart accessibilityLayer={false} data={structureData[activeStructureTab]} layout="vertical" margin={{ top: 10, right: 40, left: 10, bottom: 5 }}>
                   <defs>
                     <linearGradient id="barCyanHoriz" x1="0" y1="0" x2="1" y2="0">
                       <stop offset="0%" stopColor="#00D4FF" stopOpacity={0.2}/>
@@ -331,7 +331,7 @@ export const PersonnelStructure = () => {
 
         <ChartCard title="人才籍贯分布">
           <ResponsiveContainer width="100%" height="100%" minHeight={200}>
-            <PieChart key="hometown-distribution-pie">
+            <PieChart accessibilityLayer={false}>
               <Pie data={hometownData} cx="50%" cy="45%" innerRadius={50} outerRadius={75} paddingAngle={4} dataKey="value" stroke="rgba(255,255,255,0.05)" strokeWidth={2}>
                 {hometownData.map((entry, index) => <Cell key={entry.id} fill={COLORS[(index + 5) % COLORS.length]} />)}
               </Pie>
