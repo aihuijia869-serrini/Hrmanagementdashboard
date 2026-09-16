@@ -1,32 +1,6 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { motion } from "motion/react";
 import {
-  Shield,
-  BookOpen,
-  Award,
-  Users,
-  Target,
-  Trophy,
-  RotateCw,
-  Maximize2,
-  CheckCircle2,
-  AlertTriangle,
-  AlertCircle,
-  HelpCircle,
-  TrendingUp,
-  FileCheck2,
-  BellRing,
-  Clock,
-  ChevronRight,
-  BarChart3,
-  Calendar,
-  Building2,
-  Sparkles,
-  Send,
-  Layers,
-  GraduationCap
-} from "lucide-react";
-import {
-  ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
@@ -34,100 +8,175 @@ import {
   Bar,
   XAxis,
   YAxis,
-  Tooltip,
-  AreaChart,
-  Area,
-  LineChart,
-  Line,
   CartesianGrid,
-  Legend,
-  ComposedChart
+  Tooltip,
+  ResponsiveContainer,
+  LabelList,
+  Treemap,
 } from "recharts";
-import { motion, AnimatePresence } from "motion/react";
+import {
+  Users,
+  ShieldCheck,
+  UserCheck,
+  Clock,
+  Scale,
+  RotateCw,
+  Download,
+  Maximize2,
+  Building2,
+  Award,
+  Landmark,
+} from "lucide-react";
 
-// ── Static Mock Data ──
+/* ═══════════════════════════ DESIGN TOKENS & DATA ═══════════════════════════ */
 
-// 1. 培训费用指标 (2个环形图数据: 人均培训费用 + 培训预算执行率)
-const COST_PER_PERSON = [
-  { name: "本年度费用", value: 3000, color: "#2563EB" },
-  { name: "预算余量", value: 500, color: "#E2E8F0" },
+// 1. 学历结构
+const educationData = [
+  { name: "研究生及以上", note: "含博士1人", value: 50, pct: 4.9, color: "#2563EB" },
+  { name: "本科", value: 542, pct: 53.19, color: "#0EA5E9" },
+  { name: "大专及以下", value: 412, pct: 40.43, color: "#10B981" },
+  { name: "无数据", value: 15, pct: 1.47, color: "#94A3B8" },
 ];
 
-const BUDGET_EXECUTION_RATE = [
-  { name: "已执行预算", value: 86.3, color: "#0EA5E9" },
-  { name: "未执行预算", value: 13.7, color: "#E2E8F0" },
+// 2. 政治面貌 (调换至底部分析区 40% 大卡片)
+const politicalData = [
+  { name: "党员", value: 400, pct: "38.66%", color: "#2563EB" },
+  { name: "群众", value: 514, pct: "49.66%", color: "#0EA5E9" },
+  { name: "共青团员", value: 18, pct: "1.77%", color: "#F97316" },
+  { name: "民主党派", value: 2, pct: "0.20%", color: "#8B5CF6" },
+  { name: "无数据", value: 101, pct: "9.71%", color: "#94A3B8" },
 ];
 
-// 2. 报名中课程数据 (列表显示：课程名称、报名截止时间、报名人数)
-const ENROLLING_COURSES = [
-  { id: 1, name: "2026年合规管理与风险防控班", deadline: "2026-09-25", count: "128人", color: "#2563EB" },
-  { id: 2, name: "新一代数字化工具应用实操班", deadline: "2026-09-28", count: "95人", color: "#0EA5E9" },
-  { id: 3, name: "施工现场隐患排查双控强化班", deadline: "2026-10-02", count: "142人", color: "#10B981" },
-  { id: 4, name: "中层干部卓越领导力研修班", deadline: "2026-10-05", count: "86人", color: "#F59E0B" },
-  { id: 5, name: "集团财务制度与税务筹划班", deadline: "2026-10-08", count: "64人", color: "#8B5CF6" },
+// 3. 籍贯分布 (紧凑型玫瑰图数据: 广东高亮绿811人 78.59%)
+const nativePlaceData = [
+  { name: "广东省", value: 811, pct: "78.59%", color: "#10B981" },
+  { name: "广西省", value: 83, pct: "8.02%", color: "#0EA5E9" },
+  { name: "湖南省", value: 52, pct: "5.02%", color: "#38BDF8" },
+  { name: "湖北省", value: 28, pct: "2.71%", color: "#818CF8" },
+  { name: "四川省", value: 21, pct: "2.03%", color: "#A7F3D0" },
+  { name: "其他省份", value: 40, pct: "3.63%", color: "#CBD5E1" },
 ];
 
-// 3. 培训讲师数据 (柱状图: 内部讲师数 30人, 外部讲师数 25人)
-const LECTURER_DATA = [
-  { name: "内部讲师", count: 30, color: "#2563EB" },
-  { name: "外部讲师", count: 25, color: "#10B981" },
+// 4. 工龄结构 - 鲜艳色彩梯度
+const workTenureData = [
+  { name: "21年以上", value: 339, color: "#2563EB" },
+  { name: "16-20年", value: 151, color: "#0EA5E9" },
+  { name: "11-15年", value: 193, color: "#10B981" },
+  { name: "6-10年", value: 166, color: "#F59E0B" },
+  { name: "5年以下", value: 170, color: "#8B5CF6" },
 ];
 
-// 4. 培训实施进度（实施中课程）(横向条形图)
-const IN_PROGRESS_COURSES = [
-  { name: "2026年安全生产特种作业考核班", progress: 92.6, rateText: "92.6%", color: "#2563EB" },
-  { name: "网络与数据安全合规专项班", progress: 87.4, rateText: "87.4%", color: "#0EA5E9" },
-  { name: "国有资产数字化监管实务班", progress: 81.5, rateText: "81.5%", color: "#06B6D4" },
-  { name: "工程项目风险防控强化班", progress: 76.9, rateText: "76.9%", color: "#10B981" },
-  { name: "中高层领导力提升研修班", progress: 72.4, rateText: "72.4%", color: "#8B5CF6" },
-  { name: "新入职员工岗前综合培训班", progress: 69.8, rateText: "69.8%", color: "#6366F1" },
+// 5. 司龄结构 - 鲜艳色彩梯度
+const companyTenureData = [
+  { name: "21年以上", value: 650, color: "#0284C7" },
+  { name: "16-20年", value: 119, color: "#10B981" },
+  { name: "11-15年", value: 95, color: "#38BDF8" },
+  { name: "6-10年", value: 85, color: "#EC4899" },
+  { name: "5年以下", value: 70, color: "#F59E0B" },
 ];
 
-// 5. 未执行计划拆分
-const UNEXECUTED_PLAN_BREAKDOWN = [
-  { name: "待实施计划", count: 18, percentage: "72.0%", color: "#3B82F6" },
-  { name: "超期计划", count: 7, percentage: "28.0%", color: "#EF4444" },
+// 6. 用工类型 (固定工/正式工10人、合同工500人、实习生100人、退休返聘10人、劳务派遣300、其他50人)
+const employmentData = [
+  { name: "合同工", value: 500, pct: "51.55%", color: "#2563EB" },
+  { name: "劳务派遣", value: 300, pct: "30.93%", color: "#0EA5E9" },
+  { name: "实习生", value: 100, pct: "10.31%", color: "#10B981" },
+  { name: "其他", value: 50, pct: "5.15%", color: "#8B5CF6" },
+  { name: "正式工", value: 10, pct: "1.03%", color: "#F59E0B" },
+  { name: "退休返聘", value: 10, pct: "1.03%", color: "#EC4899" },
 ];
 
-// 6. 培训计划执行率趋势 (1-9月)
-const PLAN_EXECUTION_TREND = [
-  { month: "1月", executionRate: 72.4, target: 80.0 },
-  { month: "2月", executionRate: 75.8, target: 80.0 },
-  { month: "3月", executionRate: 79.2, target: 82.0 },
-  { month: "4月", executionRate: 83.5, target: 85.0 },
-  { month: "5月", executionRate: 81.0, target: 85.0 },
-  { month: "6月", executionRate: 86.8, target: 88.0 },
-  { month: "7月", executionRate: 85.4, target: 88.0 },
-  { month: "8月", executionRate: 88.2, target: 90.0 },
-  { month: "9月", executionRate: 89.6, target: 90.0 },
+// 7. 民族结构 (环形玫瑰图数据)
+const ethnicData = [
+  { name: "汉族", value: 1022, pct: "98.74%", color: "#2563EB", outerR: 42 },
+  { name: "壮族", value: 6, pct: "0.58%", color: "#0EA5E9", outerR: 35 },
+  { name: "苗族", value: 3, pct: "0.29%", color: "#10B981", outerR: 30 },
+  { name: "土家族", value: 2, pct: "0.19%", color: "#F59E0B", outerR: 26 },
+  { name: "其他", value: 2, pct: "0.19%", color: "#8B5CF6", outerR: 24 },
 ];
 
-// 7. 培训形式分布 (多 X 轴图数据: 包含形式模式 X1 轴 + 课程维度 X2 轴)
-const MULTI_X_TRAINING_MODE_DATA = [
-  { mode: "线上培训", category: "平台微课/自学", classCount: 8, peopleCount: 260, color: "#2563EB" },
-  { mode: "线下培训", category: "面授/实操演练", classCount: 6, peopleCount: 180, color: "#0EA5E9" },
-  { mode: "混合式培训", category: "线上理论+线下考", classCount: 4, peopleCount: 140, color: "#10B981" },
+// 8. 年龄结构 (底部分析区左侧 60% - 鲜艳色彩)
+const ageData = [
+  { name: "56岁以上", value: 79, color: "#8B5CF6", highlight: false },
+  { name: "50-55岁", value: 136, color: "#2563EB", highlight: false },
+  { name: "46-50岁", value: 126, color: "#0EA5E9", highlight: false },
+  { name: "41-45岁", value: 142, color: "#F59E0B", highlight: false },
+  { name: "40岁以下", value: 536, color: "#10B981", highlight: true },
 ];
 
-// 8. 培训类型分布数据
-const TRAINING_TYPE_DISTRIBUTION = [
-  { name: "安全合规", count: 28 },
-  { name: "业务技能", count: 24 },
-  { name: "管理提升", count: 18 },
-  { name: "新员工", count: 12 },
-  { name: "党建纪检", count: 10 },
-  { name: "综合素质", count: 8 },
+// 9. 管理层次分布 (调换至左侧栏模块二 - 鲜艳配色甜甜圈图)
+const managementHierarchyData = [
+  { name: "集团领导正职", value: 2, pct: "0.19%", color: "#EC4899" },
+  { name: "集团领导副职", value: 6, pct: "0.58%", color: "#F59E0B" },
+  { name: "集团中层正级", value: 18, pct: "1.74%", color: "#8B5CF6" },
+  { name: "集团中层副职", value: 29, pct: "2.80%", color: "#2563EB" },
+  { name: "二级企业中层正职", value: 45, pct: "4.35%", color: "#0EA5E9" },
+  { name: "二级企业中层副职", value: 85, pct: "8.21%", color: "#10B981" },
+  { name: "其他人员", value: 850, pct: "82.13%", color: "#64748B" },
 ];
 
-// 9. 未实施计划详情列表 (表头：计划名称、所属组织、计划时间、状态: 超期 / 待实施)
-const UNEXECUTED_WARNING_TABLE = [
-  { id: "P-01", planName: "2026建工特种资质复审班", org: "工程管理部", planDate: "2026-09-25", status: "超期" },
-  { id: "P-02", planName: "智能调度系统应急演练班", org: "运营指挥中心", planDate: "2026-09-28", status: "待实施" },
-  { id: "P-03", planName: "新合规准则下的税务统筹班", org: "财务与资产部", planDate: "2026-10-02", status: "待实施" },
-  { id: "P-04", planName: "全员消防安全现场演练班", org: "安全监管部", planDate: "2026-09-22", status: "超期" },
+type KpiItem = {
+  label: string;
+  icon: React.ElementType;
+  value?: number;
+  unit?: string;
+  decimals?: number;
+  text?: string;
+  iconColor: string;
+  badgeBg: string;
+  cardBorder: string;
+};
+
+const kpiItems: KpiItem[] = [
+  {
+    label: "从业人数",
+    value: 1035,
+    unit: "人",
+    icon: Users,
+    decimals: 0,
+    iconColor: "#2563EB",
+    badgeBg: "bg-[#2563EB]/12 border-[#2563EB]/30",
+    cardBorder: "border-[#2563EB]/30 hover:border-[#2563EB]",
+  },
+  {
+    label: "职工人数",
+    value: 1019,
+    unit: "人",
+    icon: ShieldCheck,
+    decimals: 0,
+    iconColor: "#0EA5E9",
+    badgeBg: "bg-[#0EA5E9]/12 border-[#0EA5E9]/30",
+    cardBorder: "border-[#0EA5E9]/30 hover:border-[#0EA5E9]",
+  },
+  {
+    label: "在岗职工",
+    value: 1016,
+    unit: "人",
+    icon: UserCheck,
+    decimals: 0,
+    iconColor: "#10B981",
+    badgeBg: "bg-[#10B981]/12 border-[#10B981]/30",
+    cardBorder: "border-[#10B981]/30 hover:border-[#10B981]",
+  },
+  {
+    label: "平均年龄",
+    value: 40.95,
+    unit: "岁",
+    icon: Clock,
+    decimals: 2,
+    iconColor: "#D97706",
+    badgeBg: "bg-[#F59E0B]/12 border-[#F59E0B]/30",
+    cardBorder: "border-[#F59E0B]/30 hover:border-[#F59E0B]",
+  },
+  {
+    label: "男女比例",
+    text: "71.64:28.36",
+    icon: Scale,
+    iconColor: "#8B5CF6",
+    badgeBg: "bg-[#8B5CF6]/12 border-[#8B5CF6]/30",
+    cardBorder: "border-[#8B5CF6]/30 hover:border-[#8B5CF6]",
+  },
 ];
 
-// 细线导航栏选项
 const NAV_TABS = [
   "总览",
   "人员结构分析",
@@ -137,133 +186,1093 @@ const NAV_TABS = [
   "工资总额执行分析",
 ];
 
-// ── Reusable Component: Module Section Header ──
-function ModuleHeader({ title, subtext, action }: { title: string; subtext?: string; action?: React.ReactNode }) {
+/* ═══════════════════════════ UTILITIES & COMMON COMPONENTS ═══════════════════════════ */
+
+function AnimatedNumber({ value, decimals = 0 }: { value: number; decimals?: number }) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    let rafId: number;
+    const tick = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / 1800, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setN(value * eased);
+      if (p < 1) rafId = requestAnimationFrame(tick);
+      else setN(value);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [value]);
+  return <span className="tabular-nums font-mono">{n.toFixed(decimals)}</span>;
+}
+
+function Card({
+  title,
+  children,
+  delay = 0,
+  className = "",
+  motionLabel,
+  headerExtra,
+}: {
+  title: string;
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+  motionLabel?: string;
+  headerExtra?: React.ReactNode;
+}) {
   return (
-    <div className="flex items-center justify-between mb-2 shrink-0">
-      <div className="flex items-center gap-2">
-        <div className="w-[3px] h-4 rounded-full bg-gradient-to-b from-[#2563EB] to-[#0EA5E9]" />
-        <h3 className="text-[14px] font-bold text-[#0F172A] tracking-wide flex items-center gap-1.5">
-          {title}
-        </h3>
-        {subtext && <span className="text-[11px] text-[#64748B] font-normal">{subtext}</span>}
+    <motion.div
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, delay }}
+      className={`relative bg-white/93 backdrop-blur-md rounded-[16px] border border-[#E2E8F0]
+        shadow-[0_4px_24px_rgba(37,99,235,0.07)] flex flex-col overflow-hidden group hover:-translate-y-[2px] transition-all duration-300 ${className}`}
+    >
+      {/* Top 1px white highlight line */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent z-10 pointer-events-none" />
+
+      {/* Dynamic light scan effect */}
+      <motion.div
+        className="absolute top-0 left-0 right-0 h-[1.5px] opacity-0 group-hover:opacity-100 z-20 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent, #2563EB 35%, #0EA5E9 65%, transparent)",
+        }}
+        animate={{ x: ["-100%", "100%"] }}
+        transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 3.6, ease: "linear" }}
+      />
+
+      {/* Header bar */}
+      <div className="flex items-center justify-between px-3.5 pt-3 pb-[8px] shrink-0 border-b border-[#F1F5F9] bg-gradient-to-r from-[#2563EB]/4 via-[#0EA5E9]/2 to-transparent">
+        <div className="flex items-center gap-2">
+          {/* 3px wide blue-cyan gradient vertical bar */}
+          <span className="w-[3px] h-[15px] rounded-full bg-gradient-to-b from-[#2563EB] to-[#0EA5E9] shadow-[0_0_6px_rgba(37,99,235,0.4)]" />
+          <span className="text-[15px] font-medium text-[#334155] tracking-wide">
+            {title}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {motionLabel && (
+            <span className="text-[10px] font-mono text-[#94A3B8] opacity-75">
+              {motionLabel}
+            </span>
+          )}
+          {headerExtra}
+        </div>
       </div>
-      {action}
+
+      <div className="flex-1 p-3 min-h-0 flex flex-col">{children}</div>
+    </motion.div>
+  );
+}
+
+/* ═══════════════════════════ LEFT PANEL ═══════════════════════════ */
+
+// 1. 学历结构 - 横向进度条图
+function EducationCard() {
+  return (
+    <Card
+      title="学历结构"
+      delay={0.1}
+      motionLabel="【动效】进度生幅"
+      className="flex-[1.1]"
+    >
+      <div className="flex flex-col justify-center gap-2.5 h-full">
+        {educationData.map((d) => (
+          <div key={`edu-${d.name}`}>
+            <div className="flex justify-between mb-1 text-[12px]">
+              <span className="text-[#334155] font-medium leading-none">
+                {d.name}
+                {d.note && (
+                  <span className="text-[10px] text-[#2563EB] ml-1 font-normal">
+                    ({d.note})
+                  </span>
+                )}
+              </span>
+              <span className="font-mono text-[#0F172A] font-semibold text-[12px]">
+                {d.value}人&nbsp;
+                <span className="text-[#2563EB] font-bold ml-1">{d.pct.toFixed(2)}%</span>
+              </span>
+            </div>
+            <div className="h-[8px] bg-[#EEF2F7] rounded-[8px] overflow-hidden p-[0.5px] border border-[#E2E8F0]">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(d.pct, 100)}%` }}
+                transition={{ duration: 1.1, delay: 0.25, ease: "easeOut" }}
+                className="h-full rounded-[8px] relative"
+                style={{
+                  background: `linear-gradient(90deg, ${d.color}, ${d.color}cc)`,
+                }}
+              >
+                {/* Bar top highlight */}
+                <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/50 rounded-r-[8px]" />
+              </motion.div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+// 2. 管理层次分布 - 甜甜圈图 (增加精美浅色底色背景)
+function ManagementHierarchyCard() {
+  return (
+    <Card
+      title="管理层次分布"
+      delay={0.18}
+      motionLabel="【动效】底色卡片 / 甜甜圈展开"
+      className="flex-[1.3] bg-gradient-to-br from-[#2563EB]/8 via-white to-[#0EA5E9]/5 border-[#2563EB]/25"
+    >
+      <div className="flex h-full items-center gap-2 min-h-0 bg-white/70 backdrop-blur-sm rounded-xl p-2 border border-[#2563EB]/15 shadow-inner">
+        {/* Hollow Donut Chart on Left */}
+        <div className="w-[125px] h-full shrink-0 relative flex items-center justify-center">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={managementHierarchyData}
+                cx="50%"
+                cy="50%"
+                innerRadius={30}
+                outerRadius={50}
+                paddingAngle={2.5}
+                dataKey="value"
+                stroke="#FFFFFF"
+                strokeWidth={1.5}
+                animationBegin={200}
+                animationDuration={1000}
+              >
+                {managementHierarchyData.map((e) => (
+                  <Cell key={`mgmt-cell-${e.name}`} fill={e.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  background: "#ffffff",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 8,
+                  fontSize: 11,
+                  boxShadow: "0 4px 12px rgba(37,99,235,0.08)",
+                }}
+                formatter={(v: number, name: string) => {
+                  const item = managementHierarchyData.find((d) => d.name === name);
+                  return [`${v}人 (${item?.pct})`, "人数占比"];
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="absolute text-center pointer-events-none">
+            <span className="text-[8.5px] text-[#64748B] block font-mono leading-tight">管理层次</span>
+            <span className="text-[12px] font-bold text-[#2563EB] font-mono leading-tight">1035</span>
+          </div>
+        </div>
+
+        {/* Legend list on Right */}
+        <div className="flex-1 flex flex-col justify-center gap-0.5 min-w-0 pr-0.5 overflow-hidden">
+          {managementHierarchyData.map((d) => (
+            <div
+              key={`mgmt-list-${d.name}`}
+              className="flex items-center justify-between text-[10.5px] py-0.5 border-b border-[#F1F5F9] last:border-0"
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
+                <span className="text-[#334155] font-medium truncate">{d.name}</span>
+              </div>
+              <span className="font-mono text-[#0F172A] font-semibold shrink-0 ml-1">
+                {d.value}人 <span className="text-[9.5px] text-[#64748B] font-normal">({d.pct})</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// 3. 籍贯分布 - 地图结构 (Map Structure 区域标注 + 脉冲辐射节点)
+function NativePlaceCard() {
+  return (
+    <Card
+      title="籍贯分布"
+      delay={0.26}
+      motionLabel="【动效】区域地图热点"
+      className="flex-[1.25]"
+    >
+      <div className="flex h-full items-center gap-3">
+        {/* China / South China Map Structure Visual */}
+        <div className="w-[130px] h-full shrink-0 relative bg-gradient-to-br from-[#2563EB]/5 to-[#0EA5E9]/10 rounded-xl border border-[#2563EB]/20 flex items-center justify-center overflow-hidden p-1.5">
+          {/* Map Grid Pattern */}
+          <div
+            className="absolute inset-0 opacity-20 pointer-events-none"
+            style={{
+              backgroundImage: "radial-gradient(#2563EB 1px, transparent 1px)",
+              backgroundSize: "8px 8px",
+            }}
+          />
+
+          {/* China Regional Vector Map SVG */}
+          <svg viewBox="0 0 200 160" className="w-full h-full drop-shadow-sm">
+            {/* Background China outline path mockup */}
+            <path
+              d="M 20 40 Q 60 10 120 20 T 180 50 Q 190 90 160 130 T 100 145 Q 50 150 30 110 Z"
+              fill="#E2E8F0"
+              stroke="#CBD5E1"
+              strokeWidth="1"
+            />
+            {/* Guangdong Province Highlight Shape */}
+            <path
+              d="M 105 110 C 115 105 135 112 145 125 C 135 138 115 135 105 128 Z"
+              fill="#10B981"
+              opacity="0.85"
+              stroke="#FFFFFF"
+              strokeWidth="1.5"
+            />
+            {/* Pulse Dot at Guangdong / Huizhou */}
+            <circle cx="125" cy="120" r="5" fill="#10B981" className="animate-ping opacity-75" />
+            <circle cx="125" cy="120" r="4" fill="#065F46" />
+            <circle cx="125" cy="120" r="2" fill="#FFFFFF" />
+
+            {/* Other Province Dots */}
+            <circle cx="95" cy="115" r="2.5" fill="#0EA5E9" /> {/* Guangxi */}
+            <circle cx="115" cy="90" r="2.5" fill="#38BDF8" />  {/* Hunan */}
+            <circle cx="120" cy="72" r="2" fill="#818CF8" />    {/* Hubei */}
+            <circle cx="75" cy="85" r="2" fill="#A7F3D0" />     {/* Sichuan */}
+          </svg>
+
+          {/* Map Label Overlay */}
+          <div className="absolute bottom-1 left-1.5 right-1.5 bg-white/90 backdrop-blur-sm border border-[#10B981]/40 rounded-lg px-2 py-0.5 text-center shadow-sm">
+            <span className="text-[9px] text-[#065F46] font-bold block leading-tight">广东省主集中区</span>
+            <span className="text-[11px] font-mono font-bold text-[#10B981] leading-tight">811人 (78.59%)</span>
+          </div>
+        </div>
+
+        {/* Province ranking breakdown */}
+        <div className="flex-1 flex flex-col justify-center gap-1 pr-0.5">
+          {nativePlaceData.map((p) => (
+            <div
+              key={`map-list-${p.name}`}
+              className={`flex items-center justify-between rounded-lg px-2 py-0.5 border text-[10.5px] transition-colors ${
+                p.name === "广东省"
+                  ? "bg-[#10B981]/10 border-[#10B981]/40 shadow-sm"
+                  : "bg-[#F8FAFC] border-[#E2E8F0]"
+              }`}
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{ background: p.color }}
+                />
+                <span
+                  className={`truncate font-medium ${
+                    p.name === "广东省" ? "text-[#065F46] font-bold" : "text-[#334155]"
+                  }`}
+                >
+                  {p.name}
+                </span>
+              </div>
+              <span className="font-mono text-[10.5px] font-semibold text-[#0F172A]">
+                {p.value}人{" "}
+                <span
+                  className={`text-[9.5px] font-normal ${
+                    p.name === "广东省" ? "text-[#10B981] font-bold" : "text-[#64748B]"
+                  }`}
+                >
+                  ({p.pct})
+                </span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+/* ═══════════════════════════ CENTER VISUAL AREA (Compact Layout) ═══════════════════════════ */
+
+function SemiRealisticMaleSilhouette() {
+  return (
+    <svg viewBox="0 0 160 230" fill="none" className="w-full h-full">
+      <defs>
+        <linearGradient id="maleBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#2563EB" />
+          <stop offset="100%" stopColor="#1D4ED8" />
+        </linearGradient>
+        <linearGradient id="maleSuitGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#1E40AF" />
+          <stop offset="100%" stopColor="#1E3A8A" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="80" cy="220" rx="55" ry="8" fill="#2563EB" opacity="0.22" />
+      <circle cx="80" cy="40" r="23" fill="url(#maleBodyGrad)" />
+      <path
+        d="M 60 36 C 60 22 72 16 80 16 C 92 16 98 24 98 34 C 92 28 82 26 74 32 C 68 36 64 36 60 36 Z"
+        fill="#1E3A8A"
+        opacity="0.85"
+      />
+      <rect x="74" y="60" width="12" height="15" rx="3" fill="url(#maleBodyGrad)" />
+      <path d="M 72 70 L 80 82 L 88 70 Z" fill="#FFFFFF" opacity="0.9" />
+      <path d="M 78 78 L 82 78 L 81 125 L 80 132 L 79 125 Z" fill="#0EA5E9" />
+      <path
+        d="M 28 205 C 26 152 45 106 80 100 C 115 106 134 152 132 205 L 132 215 Q 80 225 28 215 Z"
+        fill="url(#maleSuitGrad)"
+      />
+      <path d="M 80 100 L 64 128 L 80 142 Z" fill="#172554" opacity="0.5" />
+      <path d="M 80 100 L 96 128 L 80 142 Z" fill="#172554" opacity="0.5" />
+      <path d="M 44 116 Q 22 148 26 180 Q 30 188 38 180 Q 38 150 60 128 Z" fill="url(#maleSuitGrad)" />
+      <path d="M 116 116 Q 138 148 134 180 Q 130 188 122 180 Q 122 150 100 128 Z" fill="url(#maleSuitGrad)" />
+    </svg>
+  );
+}
+
+function SemiRealisticFemaleSilhouette() {
+  return (
+    <svg viewBox="0 0 160 230" fill="none" className="w-full h-full">
+      <defs>
+        <linearGradient id="femaleBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0EA5E9" />
+          <stop offset="100%" stopColor="#0284C7" />
+        </linearGradient>
+        <linearGradient id="femaleSuitGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#0369A1" />
+          <stop offset="100%" stopColor="#075985" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="80" cy="220" rx="48" ry="7" fill="#0EA5E9" opacity="0.22" />
+      <path
+        d="M 52 40 C 50 18 72 14 80 14 C 98 14 108 24 106 48 C 102 65 96 80 94 92 C 86 88 84 80 84 75 C 72 75 60 62 52 40 Z"
+        fill="#075985"
+        opacity="0.75"
+      />
+      <circle cx="80" cy="38" r="21" fill="url(#femaleBodyGrad)" />
+      <rect x="75" y="57" width="10" height="13" rx="3" fill="url(#femaleBodyGrad)" />
+      <path d="M 70 68 Q 80 82 90 68" fill="none" stroke="#FFFFFF" strokeWidth="2" opacity="0.8" />
+      <path
+        d="M 32 205 C 30 155 48 108 80 102 C 112 108 130 155 128 205 L 128 215 Q 80 224 32 215 Z"
+        fill="url(#femaleSuitGrad)"
+      />
+      <path d="M 48 118 Q 28 148 32 180 Q 36 186 42 180 Q 42 152 64 128 Z" fill="url(#femaleSuitGrad)" />
+      <path d="M 112 118 Q 132 148 128 180 Q 124 186 118 180 Q 118 152 96 128 Z" fill="url(#femaleSuitGrad)" />
+    </svg>
+  );
+}
+
+function CenterHero({
+  mode,
+  setMode,
+}: {
+  mode: "single" | "combined";
+  setMode: (m: "single" | "combined") => void;
+}) {
+  return (
+    <div className="flex-1 bg-white/93 backdrop-blur-md rounded-[16px] border border-[#E2E8F0] shadow-[0_4px_24px_rgba(37,99,235,0.07)] relative overflow-hidden flex flex-col p-3.5 min-h-0">
+      {/* Top Bar inside Center Area: Control Bar for Date & Analysis Mode */}
+      <div className="flex items-center justify-between z-20 pb-2 border-b border-[#F1F5F9] bg-gradient-to-r from-[#2563EB]/5 via-[#0EA5E9]/3 to-transparent px-2.5 py-1.5 rounded-xl">
+        <div className="flex items-center gap-2.5">
+          <span className="w-[3px] h-[14px] rounded-full bg-gradient-to-b from-[#2563EB] to-[#0EA5E9]" />
+          <span className="text-[12px] font-semibold text-[#1E293B]">
+            人员结构分析视角
+          </span>
+          <div className="h-3.5 w-px bg-[#CBD5E1]" />
+          <span className="text-[11px] font-mono text-[#64748B]">
+            统计周期：<span className="text-[#2563EB] font-bold">2026-01-01 至 2026-12-31</span>
+          </span>
+        </div>
+
+        {/* Single / Combined Toggle */}
+        <div className="flex items-center gap-1 bg-[#F1F5F9] p-0.5 rounded-full border border-[#E2E8F0] shadow-inner">
+          <button
+            onClick={() => setMode("single")}
+            className={`px-3 py-0.5 text-[11px] rounded-full transition-all font-medium ${
+              mode === "single"
+                ? "bg-[#2563EB] text-white shadow-sm font-bold"
+                : "text-[#64748B] hover:text-[#334155]"
+            }`}
+          >
+            单户分析
+          </button>
+          <button
+            onClick={() => setMode("combined")}
+            className={`px-3 py-0.5 text-[11px] rounded-full transition-all font-medium ${
+              mode === "combined"
+                ? "bg-[#2563EB] text-white shadow-sm font-bold"
+                : "text-[#64748B] hover:text-[#334155]"
+            }`}
+          >
+            合并分析
+          </button>
+        </div>
+      </div>
+
+      {/* Ambient background glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[580px] h-[280px] bg-gradient-to-tr from-[#2563EB]/14 via-[#0EA5E9]/12 to-transparent blur-[100px] rounded-full pointer-events-none" />
+
+      {/* Dynamic Background Tech Mesh / Circuit Lines */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20 z-0 overflow-hidden">
+        <defs>
+          <pattern id="centerGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#2563EB" strokeWidth="0.8" strokeDasharray="2 4" />
+            <circle cx="0" cy="0" r="1.5" fill="#2563EB" />
+          </pattern>
+          <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#2563EB" stopOpacity="0" />
+            <stop offset="50%" stopColor="#0EA5E9" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#10B981" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#centerGrid)" />
+        {/* Animated Tech Curves */}
+        <motion.path
+          d="M -100 120 Q 200 40 500 150 T 1100 100"
+          fill="none"
+          stroke="url(#waveGrad)"
+          strokeWidth="2"
+          animate={{ d: ["M -100 120 Q 200 40 500 150 T 1100 100", "M -100 100 Q 200 160 500 80 T 1100 140", "M -100 120 Q 200 40 500 150 T 1100 100"] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.path
+          d="M -100 180 Q 300 240 600 140 T 1100 220"
+          fill="none"
+          stroke="url(#waveGrad)"
+          strokeWidth="1.5"
+          strokeDasharray="4 4"
+          animate={{ d: ["M -100 180 Q 300 240 600 140 T 1100 220", "M -100 200 Q 300 120 600 220 T 1100 160", "M -100 180 Q 300 240 600 140 T 1100 220"] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </svg>
+
+      {/* Figures Container - Tighter & More Compact */}
+      <div className="flex-1 flex items-center justify-center z-10 min-h-0 relative py-1">
+        {/* Connecting SVG Light Trails */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible">
+          <defs>
+            <linearGradient id="lineMale" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#2563EB" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#2563EB" stopOpacity="0.1" />
+            </linearGradient>
+            <linearGradient id="lineFemale" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#0EA5E9" stopOpacity="0.7" />
+              <stop offset="100%" stopColor="#0EA5E9" stopOpacity="0.1" />
+            </linearGradient>
+          </defs>
+          <path d="M 240 160 Q 240 185 190 205" stroke="url(#lineMale)" strokeWidth="1.5" strokeDasharray="3 3" fill="none" />
+          <path d="M 440 160 Q 440 185 490 205" stroke="url(#lineFemale)" strokeWidth="1.5" strokeDasharray="3 3" fill="none" />
+        </svg>
+
+        <div className="flex items-end justify-center gap-[90px] w-full max-w-[620px] z-10">
+          {/* Male Silhouette */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="flex flex-col items-center gap-1 relative"
+          >
+            <div className="w-[140px] h-[190px] drop-shadow-lg">
+              <SemiRealisticMaleSilhouette />
+            </div>
+            <div className="bg-white/95 border border-[#2563EB]/35 rounded-xl px-4 py-1.5 text-center shadow-[0_4px_18px_rgba(37,99,235,0.14)] -mt-2">
+              <div className="text-[11px] text-[#64748B] font-medium">男性人员形象</div>
+              <div className="font-mono font-bold text-[#2563EB] flex items-baseline justify-center gap-1">
+                <span className="text-[21px]">730</span>
+                <span className="text-[11px] text-[#64748B] font-normal">人</span>
+                <span className="text-[11px] text-[#2563EB] ml-0.5">71.64%</span>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Divider Badge */}
+          <div className="flex flex-col items-center gap-1 pb-6 opacity-50">
+            <div className="w-px h-10 bg-gradient-to-b from-transparent to-[#2563EB]" />
+            <div className="w-7 h-7 rounded-full border border-[#2563EB]/40 bg-white shadow-sm flex items-center justify-center">
+              <span className="text-[8.5px] font-bold text-[#2563EB] font-mono">VS</span>
+            </div>
+            <div className="w-px h-10 bg-gradient-to-t from-transparent to-[#2563EB]" />
+          </div>
+
+          {/* Female Silhouette */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="flex flex-col items-center gap-1 relative"
+          >
+            <div className="w-[130px] h-[190px] drop-shadow-lg">
+              <SemiRealisticFemaleSilhouette />
+            </div>
+            <div className="bg-white/95 border border-[#0EA5E9]/35 rounded-xl px-4 py-1.5 text-center shadow-[0_4px_18px_rgba(14,165,233,0.14)] -mt-2">
+              <div className="text-[11px] text-[#64748B] font-medium">女性人员形象</div>
+              <div className="font-mono font-bold text-[#0EA5E9] flex items-baseline justify-center gap-1">
+                <span className="text-[21px]">289</span>
+                <span className="text-[11px] text-[#64748B] font-normal">人</span>
+                <span className="text-[11px] text-[#0EA5E9] ml-0.5">28.36%</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+
+      {/* Connected Glowing Data Cards - Enlarged with Vibrant Colorful Icons */}
+      <div className="grid grid-cols-5 gap-3 z-10 shrink-0 mt-1">
+        {kpiItems.map((kpi, i) => {
+          const Icon = kpi.icon;
+          return (
+            <motion.div
+              key={`kpi-${kpi.label}`}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35 + i * 0.07 }}
+              className={`bg-white rounded-2xl border px-4 py-3.5 flex flex-col justify-between gap-1.5 shadow-[0_6px_24px_rgba(37,99,235,0.12)] transition-all cursor-default group relative overflow-hidden ${kpi.cardBorder}`}
+            >
+              {/* Soft Bottom Ambient Glow */}
+              <div
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4/5 h-4 blur-[8px] pointer-events-none opacity-60"
+                style={{ background: kpi.iconColor }}
+              />
+
+              <div className="flex items-center justify-between">
+                <span className="text-[12.5px] text-[#475569] font-semibold truncate">
+                  {kpi.label}
+                </span>
+                {/* Colorful Badge with Icon */}
+                <div
+                  className={`w-7 h-7 rounded-xl border flex items-center justify-center shrink-0 shadow-sm transition-transform group-hover:scale-110 ${kpi.badgeBg}`}
+                >
+                  <Icon size={15} style={{ color: kpi.iconColor }} />
+                </div>
+              </div>
+
+              <div className="font-mono font-bold text-[24px] text-[#0F172A] leading-tight pt-0.5">
+                {kpi.text ? (
+                  <span className="text-[14px] text-[#0F172A] font-bold tracking-tight">
+                    {kpi.text}
+                  </span>
+                ) : (
+                  <>
+                    <AnimatedNumber value={kpi.value ?? 0} decimals={kpi.decimals} />
+                    <span className="text-[12px] text-[#64748B] font-medium ml-1">
+                      {kpi.unit}
+                    </span>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-// ── Reusable Custom Tooltip for Recharts ──
-const CustomTooltip = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white/95 border border-[#E2E8F0] shadow-lg rounded-lg px-3 py-2 text-[12px] z-50">
-        <p className="font-semibold text-[#0F172A] mb-1">{label || payload[0]?.payload?.mode}</p>
-        {payload.map((entry: any, index: number) => (
-          <div key={`tooltip-item-${index}`} className="flex items-center gap-2 text-[#475569] my-0.5">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color || entry.fill }} />
-            <span>{entry.name}:</span>
-            <span className="font-mono font-bold text-[#0F172A]">
-              {entry.value}
+/* ═══════════════════════════ RIGHT PANEL ═══════════════════════════ */
+
+// 1. 工龄结构
+function WorkTenureCard() {
+  return (
+    <Card
+      title="工龄结构"
+      delay={0.12}
+      motionLabel="【动效】横向生长"
+      className="flex-[1.15]"
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={workTenureData}
+          layout="vertical"
+          margin={{ top: 2, right: 52, left: -4, bottom: 2 }}
+        >
+          <defs>
+            <linearGradient id="wGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#2563EB" stopOpacity={0.92} />
+              <stop offset="100%" stopColor="#2563EB" stopOpacity={0.35} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="2 5" stroke="#F1F5F9" horizontal={false} />
+          <XAxis type="number" stroke="#94A3B8" fontSize={9} tickLine={false} axisLine={{ stroke: "#E2E8F0" }} />
+          <YAxis
+            dataKey="name"
+            type="category"
+            stroke="#334155"
+            fontSize={11}
+            tickLine={false}
+            axisLine={false}
+            width={58}
+          />
+          <Tooltip
+            contentStyle={{
+              background: "#fff",
+              border: "1px solid #E2E8F0",
+              borderRadius: 8,
+              fontSize: 11,
+            }}
+            formatter={(v: number) => [`${v}人`, "人数"]}
+          />
+          <Bar
+            dataKey="value"
+            radius={[0, 4, 4, 0]}
+            barSize={11}
+            animationDuration={1200}
+          >
+            {workTenureData.map((d) => (
+              <Cell key={`work-cell-${d.name}`} fill={d.color} />
+            ))}
+            <LabelList
+              key="label-list-work"
+              dataKey="value"
+              position="right"
+              style={{
+                fontSize: 10,
+                fill: "#0F172A",
+                fontFamily: "Roboto Mono, monospace",
+                fontWeight: 600,
+              }}
+              formatter={(v: any) => `${v}人`}
+            />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </Card>
+  );
+}
+
+// 2. 司龄结构
+function CompanyTenureCard() {
+  return (
+    <Card
+      title="司龄结构"
+      delay={0.22}
+      motionLabel="【动效】横向生长"
+      className="flex-[1.15]"
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          data={companyTenureData}
+          layout="vertical"
+          margin={{ top: 2, right: 58, left: -4, bottom: 2 }}
+        >
+          <defs>
+            <linearGradient id="cGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#0EA5E9" stopOpacity={0.92} />
+              <stop offset="100%" stopColor="#0EA5E9" stopOpacity={0.35} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="2 5" stroke="#F1F5F9" horizontal={false} />
+          <XAxis type="number" stroke="#94A3B8" fontSize={9} tickLine={false} axisLine={{ stroke: "#E2E8F0" }} />
+          <YAxis
+            dataKey="name"
+            type="category"
+            stroke="#334155"
+            fontSize={11}
+            tickLine={false}
+            axisLine={false}
+            width={58}
+          />
+          <Tooltip
+            contentStyle={{
+              background: "#fff",
+              border: "1px solid #E2E8F0",
+              borderRadius: 8,
+              fontSize: 11,
+            }}
+            formatter={(v: number) => [`${v}人`, "人数"]}
+          />
+          <Bar
+            dataKey="value"
+            radius={[0, 4, 4, 0]}
+            barSize={11}
+            animationDuration={1200}
+          >
+            {companyTenureData.map((d) => (
+              <Cell key={`comp-cell-${d.name}`} fill={d.color} />
+            ))}
+            <LabelList
+              key="label-list-comp"
+              dataKey="value"
+              position="right"
+              style={{
+                fontSize: 10,
+                fill: "#0F172A",
+                fontFamily: "Roboto Mono, monospace",
+                fontWeight: 600,
+              }}
+              formatter={(v: any) => `${v}人`}
+            />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </Card>
+  );
+}
+
+// 3. 用工类型 (固定工/正式工10人、合同工500人、实习生100人、退休返聘10人、劳务派遣300人、其他50人)
+function EmploymentTypeCard() {
+  return (
+    <Card
+      title="用工类型"
+      delay={0.32}
+      motionLabel="【动效】分类占比分布"
+      className="flex-[1.2]"
+    >
+      <div className="flex h-full items-center gap-2.5">
+        {/* Ring Chart on Left */}
+        <div className="w-[105px] h-full shrink-0 relative flex items-center justify-center">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={employmentData}
+                cx="50%"
+                cy="50%"
+                innerRadius={24}
+                outerRadius={44}
+                paddingAngle={2}
+                dataKey="value"
+                stroke="none"
+                animationBegin={300}
+                animationDuration={1100}
+              >
+                {employmentData.map((e) => (
+                  <Cell key={`emp-cell-${e.name}`} fill={e.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  background: "#ffffff",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 8,
+                  fontSize: 11,
+                  boxShadow: "0 4px 12px rgba(37,99,235,0.08)",
+                }}
+                formatter={(v: number, name: string) => {
+                  const item = employmentData.find((d) => d.name === name);
+                  return [`${v}人 (${item?.pct})`, name];
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="absolute text-center pointer-events-none">
+            <span className="text-[8px] text-[#64748B] block font-mono">用工</span>
+            <span className="text-[11px] font-bold text-[#0F172A] font-mono leading-tight">
+              970<span className="text-[9px] font-normal text-[#64748B]">人</span>
             </span>
           </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
+        </div>
 
-// ── Custom XAxis Tick for Training Mode Distribution (Combining mode & category) ──
-const CustomMultiXTick = (props: any) => {
-  const { x, y, payload } = props;
-  const item = MULTI_X_TRAINING_MODE_DATA[payload?.index];
-  if (!item) return null;
+        {/* Categories List on Right */}
+        <div className="flex-1 flex flex-col justify-center gap-1 min-w-0 pr-0.5">
+          {employmentData.map((d) => (
+            <div
+              key={`emp-item-${d.name}`}
+              className="flex items-center justify-between text-[10px] py-0.5 border-b border-[#F1F5F9] last:border-0"
+            >
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="w-2 h-2 rounded-[2px] shrink-0" style={{ background: d.color }} />
+                <span className="text-[#334155] font-medium truncate">{d.name}</span>
+              </div>
+              <span className="font-mono font-bold text-[#0F172A] shrink-0">
+                {d.value}人 <span className="text-[9px] font-normal text-[#64748B]">({d.pct})</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+// 4. 民族结构 - 环形玫瑰图 (Ring Rose Chart)
+function EthnicCard() {
   return (
-    <g transform={`translate(${x},${y})`}>
-      <text x={0} y={12} textAnchor="middle" fill="#0F172A" fontSize={11} fontWeight={700}>
-        {item.mode}
-      </text>
-      <text x={0} y={26} textAnchor="middle" fill="#64748B" fontSize={9.5}>
-        {item.category}
-      </text>
+    <Card
+      title="民族结构"
+      delay={0.4}
+      motionLabel="【动效】环形玫瑰辐射"
+      className="flex-[1.05]"
+    >
+      <div className="flex h-full items-center gap-2">
+        {/* Ring Rose Chart */}
+        <div className="w-[105px] h-full shrink-0 relative flex items-center justify-center">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              {ethnicData.map((e, idx) => (
+                <Pie
+                  key={`ethnic-rose-${e.name}`}
+                  data={[e]}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={18}
+                  outerRadius={e.outerR}
+                  dataKey="value"
+                  stroke="#FFFFFF"
+                  strokeWidth={1.5}
+                  startAngle={360 - idx * 72}
+                  endAngle={360 - (idx + 1) * 72}
+                  animationBegin={300 + idx * 80}
+                  animationDuration={900}
+                >
+                  <Cell fill={e.color} />
+                </Pie>
+              ))}
+              <Tooltip
+                contentStyle={{
+                  background: "#ffffff",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 8,
+                  fontSize: 11,
+                  boxShadow: "0 4px 12px rgba(37,99,235,0.08)",
+                }}
+                formatter={(v: number, name: string) => {
+                  const item = ethnicData.find((d) => d.name === name) || ethnicData[0];
+                  return [`${item.value}人 (${item.pct})`, item.name];
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="absolute text-center pointer-events-none">
+            <span className="text-[8px] text-[#64748B] block font-mono">民族</span>
+            <span className="text-[11px] font-bold text-[#2563EB] font-mono leading-tight">1035</span>
+          </div>
+        </div>
+
+        {/* Ethnic Breakdown List */}
+        <div className="flex-1 flex flex-col justify-center gap-1 overflow-hidden pr-0.5">
+          {ethnicData.slice(0, 3).map((d) => (
+            <div key={`ethnic-list-${d.name}`} className="flex items-center justify-between text-[10.5px]">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: d.color }} />
+                <span className="text-[#334155] font-medium truncate">{d.name}</span>
+              </div>
+              <span className="font-mono text-[#0F172A] font-semibold">{d.value}人</span>
+            </div>
+          ))}
+          <div className="text-[9.5px] text-[#64748B] font-mono border-t border-[#F1F5F9] pt-0.5">
+            少数民族共 13人 (1.26%)
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+/* ═══════════════════════════ BOTTOM ANALYSIS BAR (Height Increased to 350px) ═══════════════════════════ */
+
+// 左侧 60%: 年龄构成分析 - 纵向柱状图 (40岁以下高亮薄荷绿)
+function AgeStructureCard() {
+  return (
+    <Card
+      title="年龄构成分析"
+      delay={0.48}
+      motionLabel="【动效】纵向柱状生幅 / 40岁以下高亮"
+      className="h-full"
+    >
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={ageData} margin={{ top: 28, right: 28, left: -10, bottom: 4 }}>
+          <defs>
+            {ageData.map((d) => (
+              <linearGradient key={`age-bar-grad-${d.name}`} id={`ageBarG-${d.name}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={d.color} stopOpacity={0.95} />
+                <stop offset="85%" stopColor={d.color} stopOpacity={0.35} />
+              </linearGradient>
+            ))}
+          </defs>
+          <CartesianGrid strokeDasharray="3 5" stroke="#F1F5F9" vertical={false} />
+          <XAxis
+            dataKey="name"
+            stroke="#334155"
+            fontSize={12}
+            tickLine={false}
+            axisLine={{ stroke: "#E2E8F0" }}
+          />
+          <YAxis stroke="#94A3B8" fontSize={10} tickLine={false} axisLine={false} />
+          <Tooltip
+            contentStyle={{
+              background: "#fff",
+              border: "1px solid #E2E8F0",
+              borderRadius: 8,
+              fontSize: 11,
+              boxShadow: "0 4px 16px rgba(37,99,235,0.08)",
+            }}
+            formatter={(v: number) => {
+              const item = ageData.find((d) => d.value === v);
+              const pct = ((v / 1035) * 100).toFixed(2);
+              return [`${v}人 (${pct}%)`, item?.name || "人数"];
+            }}
+          />
+          <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={80} animationDuration={1300}>
+            {ageData.map((d) => (
+              <Cell key={`age-vbar-cell-${d.name}`} fill={`url(#ageBarG-${d.name})`} />
+            ))}
+            <LabelList
+              key="label-list-age"
+              dataKey="value"
+              position="top"
+              style={{
+                fontSize: 12.5,
+                fill: "#0F172A",
+                fontFamily: "Roboto Mono, monospace",
+                fontWeight: 700,
+              }}
+              formatter={(v: any) => `${v}人`}
+            />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </Card>
+  );
+}
+
+// 右侧 40%: 政治面貌 (使用 矩形树图 Treemap)
+const PoliticalTreemapContent = (props: any) => {
+  const { x, y, width, height, name, value } = props;
+
+  if (!width || !height || width <= 0 || height <= 0) return null;
+
+  const item = politicalData.find((d) => d.name === name);
+  const bg = item?.color || "#2563EB";
+
+  const showSubText = width > 50 && height > 38;
+  const showMainText = width > 30 && height > 20;
+
+  return (
+    <g>
+      <rect
+        x={x + 1}
+        y={y + 1}
+        width={width - 2}
+        height={height - 2}
+        rx={8}
+        ry={8}
+        style={{
+          fill: bg,
+          stroke: "#FFFFFF",
+          strokeWidth: 2,
+          opacity: 0.92,
+        }}
+      />
+      {showMainText && (
+        <text
+          x={x + width / 2}
+          y={showSubText ? y + height / 2 - 8 : y + height / 2}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#FFFFFF"
+          fontSize={width < 60 ? 11 : 13}
+          fontWeight="600"
+        >
+          {name}
+        </text>
+      )}
+      {showSubText && (
+        <text
+          x={x + width / 2}
+          y={y + height / 2 + 10}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="rgba(255, 255, 255, 0.95)"
+          fontSize={11}
+          fontFamily="Roboto Mono, monospace"
+          fontWeight="500"
+        >
+          {value}人 ({item?.pct})
+        </text>
+      )}
     </g>
   );
 };
 
-export default function App() {
-  const [scale, setScale] = useState(1);
-  const [activeTab, setActiveTab] = useState("培训情况分析");
-  const [mode, setMode] = useState<"single" | "combined">("single");
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [notification, setNotification] = useState<string | null>(null);
+function PoliticalBottomCard() {
+  const politicalTreemapData = useMemo(
+    () =>
+      politicalData.map((d) => ({
+        name: d.name,
+        size: d.value,
+        value: d.value,
+        pct: d.pct,
+        color: d.color,
+      })),
+    []
+  );
 
-  // Responsive 1920x1080 Scale Transform Calculation
+  return (
+    <Card
+      title="政治面貌"
+      delay={0.52}
+      motionLabel="【动效】矩形树图分布"
+      className="h-full"
+    >
+      <div className="flex flex-col h-full gap-2">
+        <div className="flex-1 min-h-0 relative">
+          <ResponsiveContainer width="100%" height="100%">
+            <Treemap
+              data={politicalTreemapData}
+              dataKey="size"
+              aspectRatio={4 / 3}
+              stroke="#FFFFFF"
+              fill="#2563EB"
+              content={<PoliticalTreemapContent />}
+              animationDuration={1000}
+            >
+              <Tooltip
+                contentStyle={{
+                  background: "#ffffff",
+                  border: "1px solid #E2E8F0",
+                  borderRadius: 8,
+                  fontSize: 11,
+                  boxShadow: "0 4px 16px rgba(37,99,235,0.08)",
+                }}
+                formatter={(v: number, name: string) => {
+                  const item = politicalData.find((d) => d.name === name);
+                  return [`${v}人 (${item?.pct || ""})`, "人数占比"];
+                }}
+              />
+            </Treemap>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Bottom Legend for small political categories */}
+        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1 pt-1.5 border-t border-[#F1F5F9]">
+          {politicalData.map((d) => (
+            <div key={`pol-legend-${d.name}`} className="flex items-center gap-1 text-[11px]">
+              <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: d.color }} />
+              <span className="text-[#475569] font-medium">{d.name}:</span>
+              <span className="font-mono text-[#0F172A] font-semibold">{d.value}人 ({d.pct})</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+/* ═══════════════════════════ MAIN DASHBOARD COMPONENT ═══════════════════════════ */
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState("人员结构分析");
+  const [mode, setMode] = useState<"single" | "combined">("combined");
+  const [scale, setScale] = useState(1);
+
   useEffect(() => {
     const updateScale = () => {
-      const sw = window.innerWidth / 1920;
-      const sh = window.innerHeight / 1080;
-      setScale(Math.min(sw, sh));
+      setScale(Math.min(window.innerWidth / 1920, window.innerHeight / 1080));
     };
     updateScale();
     window.addEventListener("resize", updateScale);
     return () => window.removeEventListener("resize", updateScale);
   }, []);
 
-  // Handle Refresh Action
-  const handleRefresh = () => {
-    setIsRefreshing(true);
-    setNotification("数据驾驶舱已同步最新状态");
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 800);
-    setTimeout(() => {
-      setNotification(null);
-    }, 3000);
-  };
-
-  // Handle Fullscreen Toggle
-  const handleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
-  };
-
-  // Floating ambient light particles
+  // Sparse floating particles (8s cycle)
   const particles = useMemo(
     () =>
-      Array.from({ length: 20 }, (_, i) => ({
+      Array.from({ length: 18 }, (_, i) => ({
         id: `p-${i}`,
         size: 2 + (i % 3),
-        top: `${(i * 29 + 11) % 94}%`,
-        left: `${(i * 43 + 7) % 96}%`,
-        dur: 6 + (i % 5),
-        delay: i * 0.3,
+        top: `${(i * 31 + 7) % 92}%`,
+        left: `${(i * 47 + 5) % 96}%`,
+        dur: 7 + (i % 4),
+        delay: i * 0.4,
       })),
     []
   );
-
-  // Dynamic KPI Values based on Mode ("single" vs "combined")
-  const kpiValues = useMemo(() => {
-    if (mode === "single") {
-      return {
-        classCount: { current: "2", previous: "0", rate: "0 %" },
-        peopleCount: { current: "6", previous: "0", rate: "0 %" },
-        cost: { current: "0", previous: "0", rate: "0 %" },
-        classHours: { current: "29", previous: "0", rate: "0 %" },
-        studentHours: { current: "30", previous: "0", rate: "0 %" },
-      };
-    }
-    return {
-      classCount: { current: "18", previous: "12", rate: "+50.0 %" },
-      peopleCount: { current: "3,850", previous: "2,920", rate: "+31.8 %" },
-      cost: { current: "128.5", previous: "105.0", rate: "+22.4 %" },
-      classHours: { current: "360", previous: "280", rate: "+28.6 %" },
-      studentHours: { current: "48,200", previous: "38,500", rate: "+25.2 %" },
-    };
-  }, [mode]);
 
   return (
     <div
@@ -271,26 +1280,11 @@ export default function App() {
         width: "100vw",
         height: "100vh",
         overflow: "hidden",
-        background: "#F8FAFC",
+        background: "#EEF2F7",
         position: "relative",
       }}
     >
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {notification && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, x: "-50%" }}
-            animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: -20, x: "-50%" }}
-            className="fixed top-4 left-1/2 z-50 bg-[#0F172A] text-white px-4 py-2 rounded-full text-[12px] font-medium shadow-xl flex items-center gap-2 border border-[#334155]"
-          >
-            <Sparkles size={14} className="text-[#0EA5E9]" />
-            <span>{notification}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Fixed 1920x1080 Canvas Container */}
+      {/* Fixed 1920x1080 Container with scale transform */}
       <div
         style={{
           width: 1920,
@@ -303,18 +1297,29 @@ export default function App() {
           overflow: "hidden",
         }}
       >
-        {/* Background Gradient & Tech Grid */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAFC] via-[#F1F5F9] to-[#EEF4FA]" />
-        <div className="absolute inset-0 bg-grid-tech pointer-events-none opacity-80" />
-        <div className="absolute top-[220px] left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-gradient-to-b from-[#2563EB]/10 via-[#0EA5E9]/5 to-transparent blur-[120px] pointer-events-none" />
+        {/* ── Background: #F7F9FC -> #EEF2F7 Linear Gradient ── */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F7F9FC] via-[#F1F5F9] to-[#EEF2F7]" />
 
-        {/* Floating micro particles */}
+        {/* 8% Opacity #2563EB Fine Grid (80px gap) */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.08]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, #2563EB 1px, transparent 1px), linear-gradient(to bottom, #2563EB 1px, transparent 1px)",
+            backgroundSize: "80px 80px",
+          }}
+        />
+
+        {/* Center-bottom Faint Blue Radial Glow */}
+        <div className="absolute bottom-[80px] left-1/2 -translate-x-1/2 w-[900px] h-[350px] bg-gradient-to-t from-[#2563EB]/10 via-[#0EA5E9]/5 to-transparent blur-[120px] pointer-events-none" />
+
+        {/* Sparse Ambient Floating Particles (8s cycle) */}
         {particles.map((p) => (
           <motion.div
             key={p.id}
-            className="absolute rounded-full bg-[#2563EB]/25 pointer-events-none"
+            className="absolute rounded-full bg-[#2563EB]/20 pointer-events-none"
             style={{ width: p.size, height: p.size, top: p.top, left: p.left }}
-            animate={{ y: [0, -18, 0], opacity: [0.15, 0.45, 0.15] }}
+            animate={{ y: [0, -20, 0], opacity: [0.15, 0.4, 0.15] }}
             transition={{
               duration: p.dur,
               repeat: Infinity,
@@ -324,53 +1329,57 @@ export default function App() {
           />
         ))}
 
-        {/* ── 顶部通栏 HEADER (90px Height) ── */}
-        <header className="absolute top-0 left-0 right-0 h-[90px] bg-white/85 backdrop-blur-md border-b border-[#E2E8F0] shadow-[0_2px_16px_rgba(37,99,235,0.06)] z-30 flex flex-col justify-between px-10 py-2">
-          
+        {/* ── TOP HEADER NAVBAR (90px Height) ── */}
+        <header className="absolute top-0 left-0 right-0 h-[90px] bg-white/80 backdrop-blur-md border-b border-[#E2E8F0] shadow-[0_2px_16px_rgba(37,99,235,0.06)] z-30 flex flex-col justify-between px-12 py-2">
           {/* Top row */}
           <div className="flex items-center justify-between w-full">
             
-            {/* Top-Left: Group Logo Badge */}
+            {/* Top-Left: Group Logo Badge & Tagline */}
             <div className="flex items-center gap-3 min-w-[320px]">
               <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#2563EB] to-[#0EA5E9] text-white px-3 py-1 rounded-lg shadow-sm">
                 <Building2 size={16} />
-                <span className="text-[13px] font-extrabold tracking-wider">惠州城投集团</span>
+                <span className="text-[13px] font-bold tracking-wider">惠州城投集团</span>
               </div>
               <span className="text-[11px] text-[#64748B] font-medium hidden md:inline">
-                人力资源数据指挥中心
+                人力资源数据指挥舱
               </span>
             </div>
 
-            {/* 居中标题：“人力资源结构分析驾驶舱” */}
+            {/* Center: Main Title */}
             <motion.h1
-              initial={{ opacity: 0, y: -8 }}
+              initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-[25px] font-extrabold tracking-[0.14em] text-[#0F172A] whitespace-nowrap drop-shadow-sm"
+              transition={{ duration: 0.7 }}
+              className="text-[26px] font-bold tracking-[0.15em] text-[#1E293B] whitespace-nowrap drop-shadow-sm"
             >
-              人力资源结构分析驾驶舱
+              惠州市城市建设投资集团 · 人力资源结构分析驾驶舱
             </motion.h1>
 
-            {/* Top-Right Action Controls */}
-            <div className="flex items-center gap-2 min-w-[320px] justify-end">
+            {/* Top-Right: Refresh, Export, Fullscreen Action Icons */}
+            <div className="flex items-center gap-2 min-w-[500px] justify-end">
               <button
-                onClick={handleRefresh}
                 title="刷新数据"
-                className="w-8 h-8 rounded-lg bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:border-[#2563EB]/40 transition-all active:scale-95"
+                className="w-8 h-8 rounded-lg bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:border-[#2563EB]/40 transition-all"
               >
-                <RotateCw size={14} className={isRefreshing ? "animate-spin text-[#2563EB]" : ""} />
+                <RotateCw size={14} />
               </button>
               <button
-                onClick={handleFullscreen}
+                title="导出报告"
+                className="w-8 h-8 rounded-lg bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:border-[#2563EB]/40 transition-all"
+              >
+                <Download size={14} />
+              </button>
+              <button
                 title="全屏模式"
-                className="w-8 h-8 rounded-lg bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:border-[#2563EB]/40 transition-all active:scale-95"
+                className="w-8 h-8 rounded-lg bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#64748B] hover:text-[#2563EB] hover:border-[#2563EB]/40 transition-all"
               >
                 <Maximize2 size={14} />
               </button>
             </div>
           </div>
 
-          {/* Sub-Navigation thin bar (标题下方细线导航栏，默认“培训情况分析”高亮) */}
-          <div className="flex items-center justify-center gap-8 pb-1 border-t border-[#E2E8F0]/60 pt-1">
+          {/* Sub-Navigation thin bar */}
+          <div className="flex items-center justify-center gap-8 pb-1">
             {NAV_TABS.map((tab) => (
               <button
                 key={`nav-tab-${tab}`}
@@ -393,629 +1402,45 @@ export default function App() {
           </div>
         </header>
 
-        {/* ── MAIN CONTENT AREA (Top 90px to Bottom 0) ── */}
-        <div className="absolute top-[90px] bottom-0 left-0 right-0 px-8 pt-3 pb-3 flex flex-col gap-2.5 overflow-hidden">
-          
-          {/* ── (二) 核心 KPI 指标行（培训整体情况） (5 胶囊式指标卡, Height ~85px) ── */}
-          <div className="grid grid-cols-5 gap-3.5 h-[85px] shrink-0">
-            
-            {/* KPI 1: 培训班总数 (珊瑚粉图标) */}
-            <div className="glass-card px-4 py-1.5 flex items-center justify-between group shadow-[0_4px_16px_rgba(244,63,94,0.06)] border-[#F43F5E]/20">
-              <div className="shimmer-line" />
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#F43F5E]/15 to-[#FB7185]/10 border border-[#F43F5E]/30 flex items-center justify-center text-[#F43F5E] shadow-sm shrink-0">
-                  <GraduationCap size={22} />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-bold text-[#0F172A]">培训班总数</span>
-                  <div className="flex items-baseline gap-1 mt-0.5">
-                    <span className="text-[22px] font-black font-mono text-[#0F172A] tracking-tight">
-                      {kpiValues.classCount.current}
-                    </span>
-                    <span className="text-[10px] text-[#64748B]">个</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-end text-[10px] text-[#64748B] gap-0.5 font-mono">
-                <span>本年度: <strong className="text-[#0F172A]">{kpiValues.classCount.current}</strong></span>
-                <span>上年度: <strong>{kpiValues.classCount.previous}</strong></span>
-                <span className="text-[#10B981] font-bold flex items-center">
-                  增长率: {kpiValues.classCount.rate}
-                </span>
-              </div>
-            </div>
-
-            {/* KPI 2: 培训人次 (薄荷绿图标) */}
-            <div className="glass-card px-4 py-1.5 flex items-center justify-between group shadow-[0_4px_16px_rgba(16,185,129,0.06)] border-[#10B981]/20">
-              <div className="shimmer-line" />
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#10B981]/15 to-[#34D399]/10 border border-[#10B981]/30 flex items-center justify-center text-[#10B981] shadow-sm shrink-0">
-                  <Users size={22} />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-bold text-[#0F172A]">培训人次</span>
-                  <div className="flex items-baseline gap-1 mt-0.5">
-                    <span className="text-[22px] font-black font-mono text-[#0F172A] tracking-tight">
-                      {kpiValues.peopleCount.current}
-                    </span>
-                    <span className="text-[10px] text-[#64748B]">人次</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-end text-[10px] text-[#64748B] gap-0.5 font-mono">
-                <span>本年度: <strong className="text-[#0F172A]">{kpiValues.peopleCount.current}</strong></span>
-                <span>上年度: <strong>{kpiValues.peopleCount.previous}</strong></span>
-                <span className="text-[#10B981] font-bold flex items-center">
-                  增长率: {kpiValues.peopleCount.rate}
-                </span>
-              </div>
-            </div>
-
-            {/* KPI 3: 培训总费用（万元） (暖橙色图标) */}
-            <div className="glass-card px-4 py-1.5 flex items-center justify-between group shadow-[0_4px_16px_rgba(245,158,11,0.06)] border-[#F59E0B]/20">
-              <div className="shimmer-line" />
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#F59E0B]/15 to-[#FBBF24]/10 border border-[#F59E0B]/30 flex items-center justify-center text-[#F59E0B] shadow-sm shrink-0">
-                  <Award size={22} />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-bold text-[#0F172A]">培训总费用（万元）</span>
-                  <div className="flex items-baseline gap-1 mt-0.5">
-                    <span className="text-[22px] font-black font-mono text-[#0F172A] tracking-tight">
-                      {kpiValues.cost.current}
-                    </span>
-                    <span className="text-[10px] text-[#64748B]">万元</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-end text-[10px] text-[#64748B] gap-0.5 font-mono">
-                <span>本年度: <strong className="text-[#0F172A]">{kpiValues.cost.current}</strong></span>
-                <span>上年度: <strong>{kpiValues.cost.previous}</strong></span>
-                <span className="text-[#10B981] font-bold flex items-center">
-                  增长率: {kpiValues.cost.rate}
-                </span>
-              </div>
-            </div>
-
-            {/* KPI 4: 培训班总学时（小时） (政务蓝图标) */}
-            <div className="glass-card px-4 py-1.5 flex items-center justify-between group shadow-[0_4px_16px_rgba(37,99,235,0.06)] border-[#2563EB]/20">
-              <div className="shimmer-line" />
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#2563EB]/15 to-[#60A5FA]/10 border border-[#2563EB]/30 flex items-center justify-center text-[#2563EB] shadow-sm shrink-0">
-                  <Clock size={22} />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-bold text-[#0F172A]">培训班总学时（小时）</span>
-                  <div className="flex items-baseline gap-1 mt-0.5">
-                    <span className="text-[22px] font-black font-mono text-[#0F172A] tracking-tight">
-                      {kpiValues.classHours.current}
-                    </span>
-                    <span className="text-[10px] text-[#64748B]">小时</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-end text-[10px] text-[#64748B] gap-0.5 font-mono">
-                <span>本年度: <strong className="text-[#0F172A]">{kpiValues.classHours.current}</strong></span>
-                <span>上年度: <strong>{kpiValues.classHours.previous}</strong></span>
-                <span className="text-[#10B981] font-bold flex items-center">
-                  增长率: {kpiValues.classHours.rate}
-                </span>
-              </div>
-            </div>
-
-            {/* KPI 5: 学员总学时（小时） (天蓝色图标) */}
-            <div className="glass-card px-4 py-1.5 flex items-center justify-between group shadow-[0_4px_16px_rgba(14,165,233,0.06)] border-[#0EA5E9]/20">
-              <div className="shimmer-line" />
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#0EA5E9]/15 to-[#38BDF8]/10 border border-[#0EA5E9]/30 flex items-center justify-center text-[#0EA5E9] shadow-sm shrink-0">
-                  <Target size={22} />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-bold text-[#0F172A]">学员总学时（小时）</span>
-                  <div className="flex items-baseline gap-1 mt-0.5">
-                    <span className="text-[22px] font-black font-mono text-[#0F172A] tracking-tight">
-                      {kpiValues.studentHours.current}
-                    </span>
-                    <span className="text-[10px] text-[#64748B]">小时</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-end text-[10px] text-[#64748B] gap-0.5 font-mono">
-                <span>本年度: <strong className="text-[#0F172A]">{kpiValues.studentHours.current}</strong></span>
-                <span>上年度: <strong>{kpiValues.studentHours.previous}</strong></span>
-                <span className="text-[#10B981] font-bold flex items-center">
-                  增长率: {kpiValues.studentHours.rate}
-                </span>
-              </div>
-            </div>
-
+        {/* ── MAIN CONTENT (12-Column Grid, 48px margins, 24px gap) ── */}
+        <main
+          className="absolute top-[90px] bottom-0 left-0 right-0 grid grid-cols-12 gap-[24px] px-[48px] pt-[16px] pb-[16px] overflow-hidden"
+          style={{ height: "calc(1080px - 90px)" }}
+        >
+          {/* LEFT PANEL (22% width => 3 cols in 12-col grid) */}
+          <div className="col-span-3 flex flex-col gap-[16px] h-full overflow-hidden">
+            <EducationCard />
+            {/* Left Module 2: 管理层次分布 */}
+            <ManagementHierarchyCard />
+            <NativePlaceCard />
           </div>
 
-          {/* ── MIDDLE GRID (Left Info Column + Center Main Visual + Right Info Column, Height ~570px) ── */}
-          <div className="grid grid-cols-12 gap-3.5 h-[565px] shrink-0">
-            
-            {/* ── LEFT INFO COLUMN (3 Cols) ── */}
-            <div className="col-span-3 flex flex-col gap-3 h-full overflow-hidden">
-              
-              {/* Left Card 1: 培训费用指标 */}
-              <div className="glass-card p-3 flex flex-col h-[200px]">
-                <div className="shimmer-line" />
-                <ModuleHeader title="培训费用指标" subtext="费用与预算执行概况" />
-                
-                <div className="grid grid-cols-2 gap-2 h-full mt-0.5 items-center">
-                  {/* 环形图 1: 人均培训费用 */}
-                  <div className="flex flex-col items-center bg-slate-50/80 p-2 rounded-xl border border-slate-200/60 h-full justify-between">
-                    <span className="text-[11px] font-bold text-[#0F172A]">人均培训费用</span>
-                    <div className="w-[85px] h-[85px] relative my-0.5">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie data={COST_PER_PERSON} innerRadius={28} outerRadius={40} paddingAngle={2} dataKey="value">
-                            {COST_PER_PERSON.map((entry, idx) => (
-                              <Cell key={`cost-cell-${idx}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-[12px] font-black font-mono text-[#0F172A]">3000元</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center text-[9.5px] text-[#64748B] font-mono leading-tight">
-                      <span>上年度: 1,620元</span>
-                      <span className="text-[#10B981] font-bold">增减率: +14.2%</span>
-                    </div>
-                  </div>
+          {/* CENTER VISUAL AREA & BOTTOM ANALYSIS BAR (56% + 100% bottom => 6 cols center) */}
+          <div className="col-span-6 flex flex-col gap-[16px] h-full min-w-0 overflow-hidden">
+            {/* Center Upper + KPI Zone with Analysis View Control Bar */}
+            <CenterHero mode={mode} setMode={setMode} />
 
-                  {/* 环形图 2: 培训预算执行率 */}
-                  <div className="flex flex-col items-center bg-slate-50/80 p-2 rounded-xl border border-slate-200/60 h-full justify-between">
-                    <span className="text-[11px] font-bold text-[#0F172A]">培训预算执行率</span>
-                    <div className="w-[85px] h-[85px] relative my-0.5">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie data={BUDGET_EXECUTION_RATE} innerRadius={28} outerRadius={40} paddingAngle={2} dataKey="value">
-                            {BUDGET_EXECUTION_RATE.map((entry, idx) => (
-                              <Cell key={`budget-cell-${idx}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                        <span className="text-[12px] font-black font-mono text-[#0F172A]">86.3%</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-center text-[9.5px] text-[#64748B] font-mono leading-tight">
-                      <span>上年度: 78.5%</span>
-                      <span className="text-[#10B981] font-bold">增减率: +7.8%</span>
-                    </div>
-                  </div>
-                </div>
+            {/* Bottom Analysis Bar (Height Increased to 350px) */}
+            <div className="h-[350px] shrink-0 grid grid-cols-10 gap-[20px]">
+              {/* Bottom Left 60% => 6 cols */}
+              <div className="col-span-6 h-full">
+                <AgeStructureCard />
               </div>
-
-              {/* Left Card 2: 报名中课程 (列表显示：课程名称、报名截止时间、报名人数) */}
-              <div className="glass-card p-3 flex flex-col h-[205px]">
-                <div className="shimmer-line" />
-                <ModuleHeader title="报名中课程" subtext="课程排期与预选概况" />
-                <div className="flex flex-col gap-1.5 overflow-y-auto pr-0.5 mt-0.5 flex-1">
-                  {ENROLLING_COURSES.map((course) => (
-                    <div
-                      key={`enrolling-${course.id}`}
-                      className="flex items-center justify-between p-1.5 rounded-xl bg-slate-50/80 border border-slate-200/60 hover:bg-slate-100/80 transition-all text-[11px]"
-                    >
-                      <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: course.color }} />
-                        <span className="font-medium text-[#0F172A] truncate" title={course.name}>
-                          {course.name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0 font-mono text-[10.5px]">
-                        <span className="text-[#64748B]">截止: {course.deadline.slice(5)}</span>
-                        <span className="font-bold text-[#2563EB] bg-[#2563EB]/10 px-1.5 py-0.5 rounded">
-                          {course.count}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Left Card 3: 培训讲师 (柱状图: 内部讲师数 30人, 外部讲师数 25人) */}
-              <div className="glass-card p-3 flex flex-col flex-1">
-                <div className="shimmer-line" />
-                <ModuleHeader title="培训讲师" subtext="内部 vs 外部师资结构 (人)" />
-                <div className="flex-1 min-h-0 w-full mt-1">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={LECTURER_DATA} margin={{ top: 15, right: 20, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#64748B", fontWeight: 600 }} />
-                      <YAxis tick={{ fontSize: 10, fill: "#64748B" }} domain={[0, 40]} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Bar dataKey="count" name="讲师人数" radius={[6, 6, 0, 0]} barSize={32}>
-                        {LECTURER_DATA.map((entry, index) => (
-                          <Cell key={`lecturer-cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-            </div>
-
-            {/* ── CENTER MAIN VISUAL ZONE (6 Cols) ── */}
-            <div className="col-span-6 flex flex-col h-full overflow-hidden">
-              <div className="glass-card p-4 flex flex-col h-full justify-between relative">
-                <div className="shimmer-line" />
-                
-                {/* Center Upper Control / Filter Bar */}
-                <div className="flex items-center justify-between border-b border-[#E2E8F0]/80 pb-2.5">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] animate-pulse" />
-                    <span className="text-[14px] font-bold text-[#0F172A] tracking-wider">
-                      培训情况分析
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 border border-[#E2E8F0] rounded-lg text-[11px] font-mono text-[#475569]">
-                      <Calendar size={12} className="text-[#2563EB]" />
-                      <span>统计日期 2026-01-01 至 2026-12-31</span>
-                    </div>
-
-                    <div className="flex items-center gap-1 bg-[#F1F5F9] p-0.5 rounded-lg border border-[#E2E8F0]">
-                      <button
-                        onClick={() => setMode("single")}
-                        className={`px-2.5 py-0.5 text-[11px] rounded transition-all font-medium ${
-                          mode === "single"
-                            ? "bg-[#2563EB] text-white shadow-sm font-bold"
-                            : "text-[#64748B] hover:text-[#334155]"
-                        }`}
-                      >
-                        单户分析
-                      </button>
-                      <button
-                        onClick={() => setMode("combined")}
-                        className={`px-2.5 py-0.5 text-[11px] rounded transition-all font-medium ${
-                          mode === "combined"
-                            ? "bg-[#2563EB] text-white shadow-sm font-bold"
-                            : "text-[#64748B] hover:text-[#334155]"
-                        }`}
-                      >
-                        合并分析
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Main Central Visual Graphic: Shield + Book + Data Nodes */}
-                <div className="relative flex-1 flex flex-col items-center justify-center my-1">
-                  
-                  {/* Outer Glowing Rings */}
-                  <div className="absolute w-[330px] h-[330px] rounded-full border border-[#2563EB]/15 animate-[spin_25s_linear_infinite] pointer-events-none" />
-                  <div className="absolute w-[280px] h-[280px] rounded-full border border-dashed border-[#0EA5E9]/25 animate-[spin_18s_linear_infinite_reverse] pointer-events-none" />
-                  <div className="absolute w-[230px] h-[230px] rounded-full bg-gradient-to-tr from-[#2563EB]/10 to-[#0EA5E9]/10 blur-xl pointer-events-none" />
-
-                  {/* SVG Connection Lines & Orbit Nodes */}
-                  <svg className="absolute w-[350px] h-[350px] pointer-events-none" viewBox="0 0 350 350">
-                    <line x1="175" y1="175" x2="60" y2="65" stroke="#2563EB" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
-                    <line x1="175" y1="175" x2="290" y2="65" stroke="#0EA5E9" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
-                    <line x1="175" y1="175" x2="60" y2="285" stroke="#10B981" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
-                    <line x1="175" y1="175" x2="290" y2="285" stroke="#8B5CF6" strokeWidth="1" strokeDasharray="3 3" opacity="0.4" />
-                    <circle cx="60" cy="65" r="4" fill="#2563EB" />
-                    <circle cx="290" cy="65" r="4" fill="#0EA5E9" />
-                    <circle cx="60" cy="285" r="4" fill="#10B981" />
-                    <circle cx="290" cy="285" r="4" fill="#8B5CF6" />
-                  </svg>
-
-                  {/* Shield + Book Main Center Graphic Node */}
-                  <motion.div
-                    animate={{ y: [0, -8, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="relative w-36 h-36 rounded-3xl bg-gradient-to-br from-[#2563EB] via-[#0EA5E9] to-[#06B6D4] p-1 shadow-[0_12px_40px_rgba(37,99,235,0.3)] flex items-center justify-center z-10"
-                  >
-                    <div className="w-full h-full rounded-[22px] bg-white/10 backdrop-blur-md flex flex-col items-center justify-center text-white relative overflow-hidden">
-                      <Shield size={58} className="text-white drop-shadow-md" />
-                      <div className="absolute inset-0 flex items-center justify-center pt-2">
-                        <BookOpen size={28} className="text-white/90 drop-shadow" />
-                      </div>
-                      <span className="text-[11px] font-black tracking-widest uppercase mt-2 text-white/95">
-                        培训情况分析
-                      </span>
-                    </div>
-                  </motion.div>
-
-                  {/* 在开班级：18个 ，参加学员数：580人 */}
-                  <div className="absolute -top-1 bg-white/95 border border-[#2563EB]/30 shadow-md rounded-full px-4 py-1 flex items-center gap-4 text-[12px] z-20">
-                    <span className="font-bold text-[#0F172A] flex items-center gap-1">
-                      <GraduationCap size={15} className="text-[#2563EB]" />
-                      在开班级: <strong className="font-mono text-[14px] text-[#2563EB]">18</strong> 个
-                    </span>
-                    <span className="w-1 h-3 bg-[#E2E8F0]" />
-                    <span className="font-bold text-[#0F172A] flex items-center gap-1">
-                      <Users size={15} className="text-[#0EA5E9]" />
-                      参加学员数: <strong className="font-mono text-[14px] text-[#0EA5E9]">580</strong> 人
-                    </span>
-                  </div>
-
-                  {/* 4 Corner Satellite Data Badges */}
-                  <div className="absolute top-10 left-4 bg-white/90 border border-[#2563EB]/20 shadow-md rounded-xl px-3 py-1.5 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#2563EB]" />
-                    <span className="text-[11px] font-medium text-[#475569]">人均培训学时:</span>
-                    <span className="text-[13px] font-mono font-extrabold text-[#2563EB]">48.2 小时</span>
-                  </div>
-
-                  <div className="absolute top-10 right-4 bg-white/90 border border-[#0EA5E9]/20 shadow-md rounded-xl px-3 py-1.5 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#0EA5E9]" />
-                    <span className="text-[11px] font-medium text-[#475569]">人均培训费用:</span>
-                    <span className="text-[13px] font-mono font-extrabold text-[#0EA5E9]">3000 元</span>
-                  </div>
-
-                  <div className="absolute bottom-10 left-4 bg-white/90 border border-[#10B981]/20 shadow-md rounded-xl px-3 py-1.5 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-                    <span className="text-[11px] font-medium text-[#475569]">课程报名率:</span>
-                    <span className="text-[13px] font-mono font-extrabold text-[#10B981]">98.2%</span>
-                  </div>
-
-                  <div className="absolute bottom-10 right-4 bg-white/90 border border-[#8B5CF6]/20 shadow-md rounded-xl px-3 py-1.5 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#8B5CF6]" />
-                    <span className="text-[11px] font-medium text-[#475569]">课程满意度:</span>
-                    <span className="text-[13px] font-mono font-extrabold text-[#8B5CF6]">98%</span>
-                  </div>
-                </div>
-
-                {/* Bottom visual section: 3 组数据指标 */}
-                <div className="grid grid-cols-3 gap-3 bg-slate-50/80 p-3 rounded-2xl border border-[#E2E8F0]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-[#2563EB]/10 border border-[#2563EB]/20 flex items-center justify-center text-[#2563EB] font-mono font-bold text-[13px] shrink-0">
-                      89.6%
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[12px] font-bold text-[#0F172A]">计划完成率</span>
-                      <span className="text-[10px] text-[#64748B]">按期开班执行率</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-[#0EA5E9]/10 border border-[#0EA5E9]/20 flex items-center justify-center text-[#0EA5E9] font-mono font-bold text-[13px] shrink-0">
-                      55
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[12px] font-bold text-[#0F172A]">计划内培训数</span>
-                      <span className="text-[10px] text-[#64748B]">年度大纲预定项目</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/20 flex items-center justify-center text-[#F59E0B] font-mono font-bold text-[13px] shrink-0">
-                      35
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[12px] font-bold text-[#0F172A]">计划外培训数</span>
-                      <span className="text-[10px] text-[#64748B]">临时响应与专项评估</span>
-                    </div>
-                  </div>
-                </div>
-
+              {/* Swapped: 政治面貌 (Bottom Right 40% => 4 cols) */}
+              <div className="col-span-4 h-full">
+                <PoliticalBottomCard />
               </div>
             </div>
-
-            {/* ── RIGHT INFO COLUMN (3 Cols) ── */}
-            <div className="col-span-3 flex flex-col gap-3 h-full overflow-hidden">
-              
-              {/* Right Card 1: 培训实施进度（实施中课程） */}
-              <div className="glass-card p-3 flex flex-col h-[325px]">
-                <div className="shimmer-line" />
-                <ModuleHeader title="培训实施进度" subtext="实施中课程完成度 (%)" />
-                
-                <div className="flex flex-col gap-2 mt-1 flex-1 overflow-y-auto pr-0.5">
-                  {IN_PROGRESS_COURSES.map((item, index) => (
-                    <div key={`course-progress-${index}`} className="flex flex-col gap-1">
-                      <div className="flex items-center justify-between text-[11.5px]">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span
-                            className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-extrabold font-mono text-white shrink-0 ${
-                              index === 0
-                                ? "bg-[#F59E0B]"
-                                : index === 1
-                                ? "bg-[#0EA5E9]"
-                                : index === 2
-                                ? "bg-[#10B981]"
-                                : "bg-[#94A3B8]"
-                            }`}
-                          >
-                            {index + 1}
-                          </span>
-                          <span className="font-semibold text-[#0F172A] truncate" title={item.name}>
-                            {item.name}
-                          </span>
-                        </div>
-                        <span className="font-mono font-extrabold text-[12px] text-[#0F172A] shrink-0 ml-1">
-                          {item.rateText}
-                        </span>
-                      </div>
-                      
-                      {/* Progress Bar */}
-                      <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${item.progress}%` }}
-                          transition={{ duration: 0.8, delay: index * 0.1 }}
-                          className="h-full rounded-full"
-                          style={{
-                            background: `linear-gradient(90deg, ${item.color} 0%, #0EA5E9 100%)`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Card 2: 未执行计划 */}
-              <div className="glass-card p-3 flex flex-col flex-1">
-                <div className="shimmer-line" />
-                <ModuleHeader title="未执行计划" subtext="待实施与超期预警" />
-                
-                <div className="flex items-center gap-3 mt-1 flex-1">
-                  <div className="flex flex-col items-center justify-center bg-amber-50/80 border border-amber-200/80 rounded-2xl p-2.5 shrink-0 w-[110px]">
-                    <span className="text-[10px] font-bold text-amber-700">未执行总计划</span>
-                    <span className="text-[22px] font-black font-mono text-amber-600 my-0.5">25</span>
-                    <span className="text-[9.5px] text-[#64748B]">待实施/超期计划</span>
-                  </div>
-
-                  <div className="flex flex-col gap-1.5 flex-1 min-w-0">
-                    {UNEXECUTED_PLAN_BREAKDOWN.map((item, idx) => (
-                      <div key={`uep-item-${idx}`} className="flex flex-col gap-0.5 text-[11px]">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[#475569] font-medium">{item.name}</span>
-                          <span className="font-mono font-bold text-[#0F172A]">{item.count} 项 ({item.percentage})</span>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full" style={{ width: item.percentage, backgroundColor: item.color }} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-2 pt-2 border-t border-[#E2E8F0] flex items-center justify-between">
-                  <span className="text-[11px] text-[#64748B] flex items-center gap-1">
-                    <Clock size={12} className="text-[#EF4444]" />
-                    <span>7 项超期计划需重点督办</span>
-                  </span>
-                  <button
-                    onClick={() => {
-                      setNotification("督办通知已推送至相关责任部门负责人");
-                      setTimeout(() => setNotification(null), 3000);
-                    }}
-                    className="flex items-center gap-1 bg-[#2563EB] text-white hover:bg-[#1D4ED8] text-[11px] font-bold px-2.5 py-1 rounded-lg transition-all shadow-sm active:scale-95"
-                  >
-                    <Send size={11} />
-                    <span>一键督办</span>
-                  </button>
-                </div>
-              </div>
-
-            </div>
-
           </div>
 
-          {/* ── BOTTOM ANALYSIS AREA (4 Cards, Height ~280px) ── */}
-          <div className="grid grid-cols-12 gap-3.5 h-[275px] shrink-0">
-            
-            {/* Bottom Card 1: 培训计划执行率趋势 */}
-            <div className="col-span-3 glass-card p-3 flex flex-col h-full">
-              <div className="shimmer-line" />
-              <ModuleHeader title="培训计划执行率趋势" subtext="1-9月月度走势 (%)" />
-              <div className="flex-1 min-h-0 w-full mt-1">
-                <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={PLAN_EXECUTION_TREND} margin={{ top: 10, right: 10, left: -22, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorExec" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#2563EB" stopOpacity={0.35} />
-                        <stop offset="95%" stopColor="#0EA5E9" stopOpacity={0.0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-                    <XAxis dataKey="month" tick={{ fontSize: 10, fill: "#64748B" }} />
-                    <YAxis domain={[50, 100]} tick={{ fontSize: 10, fill: "#64748B" }} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Area type="monotone" dataKey="executionRate" name="执行率" stroke="#2563EB" strokeWidth={2.5} fillOpacity={1} fill="url(#colorExec)" />
-                    <Line type="monotone" dataKey="target" name="目标线" stroke="#F59E0B" strokeDasharray="4 4" strokeWidth={1.5} dot={false} />
-                  </ComposedChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Bottom Card 2: 培训形式分布 (多 X 轴维度展示, 自定义 Tick 渲染) */}
-            <div className="col-span-3 glass-card p-3 flex flex-col h-full">
-              <div className="shimmer-line" />
-              <ModuleHeader title="培训形式分布" subtext="多 X 轴维度 (形式/主模式/班次)" />
-              <div className="flex-1 min-h-0 w-full mt-1">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={MULTI_X_TRAINING_MODE_DATA} margin={{ top: 15, right: 10, left: -20, bottom: 15 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-                    <XAxis dataKey="mode" tick={<CustomMultiXTick />} interval={0} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: "#64748B" }} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="classCount" name="班级数量 (个)" radius={[6, 6, 0, 0]} barSize={26}>
-                      {MULTI_X_TRAINING_MODE_DATA.map((entry, index) => (
-                        <Cell key={`multi-x-bar-${index}`} fill={entry.color} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Bottom Card 3: 培训类型分布 */}
-            <div className="col-span-3 glass-card p-3 flex flex-col h-full">
-              <div className="shimmer-line" />
-              <ModuleHeader title="培训类型分布" subtext="各类班级数 (个)" />
-              <div className="flex-1 min-h-0 w-full mt-1">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={TRAINING_TYPE_DISTRIBUTION} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#64748B" }} interval={0} />
-                    <YAxis tick={{ fontSize: 10, fill: "#64748B" }} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="count" name="班级数量" radius={[4, 4, 0, 0]} barSize={14}>
-                      {TRAINING_TYPE_DISTRIBUTION.map((_, index) => (
-                        <Cell key={`type-dist-${index}`} fill={index % 2 === 0 ? "#0EA5E9" : "#2563EB"} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Bottom Card 4: 未实施计划详情 */}
-            <div className="col-span-3 glass-card p-3 flex flex-col h-full">
-              <div className="shimmer-line" />
-              <ModuleHeader title="未实施计划详情" subtext="重点跟踪与状态督办" />
-              
-              <div className="flex-1 overflow-x-auto overflow-y-auto mt-1 border border-[#E2E8F0] rounded-xl bg-white/60">
-                <table className="w-full text-left text-[11px]">
-                  <thead className="bg-slate-100/80 text-[#64748B] font-semibold sticky top-0 border-b border-[#E2E8F0]">
-                    <tr>
-                      <th className="py-1.5 px-2">计划名称</th>
-                      <th className="py-1.5 px-2">所属组织</th>
-                      <th className="py-1.5 px-2 text-center">计划时间</th>
-                      <th className="py-1.5 px-2 text-center">状态</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-[#334155]">
-                    {UNEXECUTED_WARNING_TABLE.map((row) => (
-                      <tr key={`unexec-detail-${row.id}`} className="hover:bg-slate-50 transition-colors">
-                        <td className="py-1.5 px-2 font-bold text-[#0F172A] truncate max-w-[120px]" title={row.planName}>
-                          {row.planName}
-                        </td>
-                        <td className="py-1.5 px-2 whitespace-nowrap text-[#475569]">
-                          {row.org}
-                        </td>
-                        <td className="py-1.5 px-2 text-center font-mono text-[10px] whitespace-nowrap">
-                          {row.planDate}
-                        </td>
-                        <td className="py-1.5 px-2 text-center whitespace-nowrap">
-                          <span
-                            className={`px-1.5 py-0.5 rounded text-[9.5px] font-bold ${
-                              row.status === "超期"
-                                ? "bg-rose-100 text-rose-700 border border-rose-200"
-                                : "bg-amber-100 text-amber-700 border border-amber-200"
-                            }`}
-                          >
-                            {row.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
+          {/* RIGHT PANEL (22% width => 3 cols in 12-col grid) */}
+          <div className="col-span-3 flex flex-col gap-[16px] h-full overflow-hidden">
+            <WorkTenureCard />
+            <CompanyTenureCard />
+            <EmploymentTypeCard />
+            <EthnicCard />
           </div>
-
-        </div>
+        </main>
       </div>
     </div>
   );
