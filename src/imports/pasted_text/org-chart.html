@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>组织架构图-层级树形（适配Figma）</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Microsoft YaHei",PingFang SC,sans-serif;}
+body{background:#ffffff;padding:40px;}
+
+/* 树形布局核心：嵌套 flex 实现层级关系 */
+.tree{display:flex;flex-direction:column;align-items:center;}
+.tree-node{display:flex;flex-direction:column;align-items:center;position:relative;}
+.tree-children{display:flex;gap:14px;margin-top:10px;position:relative;}
+
+/* 连线样式，体现层级父子 */
+.connector-vert{width:1px;background:#b4c8e7;height:14px;margin:0 auto;}
+
+/* 节点盒子样式 */
+.box{padding:9px 14px;border-radius:5px;text-align:center;font-size:12.5px;min-width:105px;}
+.box-yellow{background:#ffe9b2;border:1px solid #f4c058;color:#2c2c2c;}
+.box-blue{background:#d7e5f8;border:1px solid #82a8d6;color:#222;}
+.box-darkblue{background:#4274bb;color:#ffffff;border-radius:4px;min-width:92px;padding:7px 11px;font-size:11.5px;}
+.box-lightblue{background:#c8e0fa;border:1px solid #70a4e1;color:#222;}
+.box-footer{font-size:9.5px;margin-top:4px;opacity:0.72;}
+
+/* 顶部操作栏 */
+.toolbar{display:flex;gap:8px;margin-bottom:24px;}
+.btn{background:#3387eb;color:#fff;border:none;padding:6px 11px;border-radius:4px;font-size:12px;}
+.switch-group{display:flex;margin-left:12px;}
+.switch-item{border:1px solid #94bff4;padding:6px 11px;font-size:12px;}
+.switch-item.active{background:#4187ed;color:#fff;border-color:#4187ed;}
+</style>
+</head>
+<body>
+<div class="toolbar">
+    <button class="btn">重置架构图</button>
+    <button class="btn">保存当前版本</button>
+    <button class="btn">查看隐藏节点</button>
+    <button class="btn">调整架构图</button>
+    <div class="switch-group">
+        <div class="switch-item active">简称</div>
+        <div class="switch-item">全称</div>
+    </div>
+</div>
+
+<div class="tree">
+    <!-- 第1级 董事会 -->
+    <div class="tree-node">
+        <div class="box box-yellow">董事会</div>
+        <div class="connector-vert"></div>
+        <div class="tree-children">
+            <!-- 第2级 经营班子/高管 -->
+            <div class="tree-node">
+                <div class="box box-blue">
+                    经营班子/高管
+                    <div class="box-footer">在编：0 / 编制：8</div>
+                </div>
+                <div class="connector-vert"></div>
+                <div class="tree-children">
+
+                    <!-- ========== 左分支：集团本部 ========== -->
+                    <div class="tree-node">
+                        <div class="box box-yellow">集团本部</div>
+                        <div class="connector-vert"></div>
+                        <div class="tree-children">
+                            <!-- 集团本部第一排职能部门 -->
+                            <div class="tree-node"><div class="box box-blue">党委办公室<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">综合办公室<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">资金管理财务中心<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">投资拓展部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">法务管理部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">项目工管办公室<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">监督审计部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">经营管理部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">纪检监察组<div class="box-footer">在编…</div></div></div>
+                        </div>
+                        <div class="connector-vert"></div>
+                        <div class="tree-children">
+                            <!-- 集团本部第二排部门 -->
+                            <div class="tree-node"><div class="box box-blue">经营班子<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">高管<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">综合管理部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">财务管理部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">计划供应部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">风控审计部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">粮食物资储备部<div class="box-footer">在编…</div></div></div>
+                            <div class="tree-node"><div class="box box-blue">农司销售部<div class="box-footer">在编…</div></div></div>
+                        </div>
+                    </div>
+
+                    <!-- ========== 右分支：下属企业（含股权比例） ========== -->
+                    <div class="tree-node">
+                        <div class="box box-yellow">下属企业（含股权比例）</div>
+                        <div class="connector-vert"></div>
+                        <div class="tree-children">
+                            <!-- 城市服务板块 -->
+                            <div class="tree-node">
+                                <div class="box box-yellow">城市服务板块</div>
+                                <div class="connector-vert"></div>
+                                <div class="tree-children">
+                                    <div class="tree-node"><div class="box box-darkblue">储备军粮供应公司<div class="box-footer">在编…</div></div></div>
+                                    <div class="tree-node"><div class="box box-darkblue">生鲜农产投资公司<div class="box-footer">在编…</div></div></div>
+                                </div>
+                            </div>
+                            <!-- 城市运营板块 -->
+                            <div class="tree-node">
+                                <div class="box box-yellow">城市运营板块</div>
+                                <div class="connector-vert"></div>
+                                <div class="tree-children">
+                                    <div class="tree-node"><div class="box box-darkblue">城市服务城投公司<div class="box-footer">在编…</div></div></div>
+                                </div>
+                            </div>
+                            <!-- 城市建设板块 -->
+                            <div class="tree-node">
+                                <div class="box box-yellow">城市建设板块</div>
+                                <div class="connector-vert"></div>
+                                <div class="tree-children">
+                                    <div class="tree-node"><div class="box box-darkblue">安建工程公司<div class="box-footer">在编…</div></div></div>
+                                    <div class="tree-node"><div class="box box-darkblue">市政动迁公司<div class="box-footer">在编…</div></div></div>
+                                    <div class="tree-node"><div class="box box-darkblue">建筑监理公司<div class="box-footer">在编…</div></div></div>
+                                </div>
+                            </div>
+                            <!-- 城市开发板块 -->
+                            <div class="tree-node">
+                                <div class="box box-yellow">城市开发板块</div>
+                                <div class="connector-vert"></div>
+                                <div class="tree-children">
+                                    <div class="tree-node"><div class="box box-darkblue">城投开发置业<div class="box-footer">在编…</div></div></div>
+                                    <div class="tree-node"><div class="box box-darkblue">惠发展城投<div class="box-footer">在编…</div></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="connector-vert"></div>
+                        <div class="tree-children">
+                            <div class="tree-node"><div class="box box-lightblue">农副产品销售公司<div class="box-footer">在编：0 / 编制：0</div></div></div>
+                            <div class="tree-node"><div class="box box-lightblue">储军工会<div class="box-footer">在编：0 / 编制：0</div></div></div>
+                            <div class="tree-node"><div class="box box-lightblue">粮食集团<div class="box-footer">在编：0 / 编制：0</div></div></div>
+                            <div class="tree-node"><div class="box box-lightblue">外包人员<div class="box-footer">在编：0 / 编制：0</div></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

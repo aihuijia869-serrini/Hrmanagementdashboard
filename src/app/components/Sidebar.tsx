@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, CircleDollarSign, UserMinus, FileText, GraduationCap, PieChart } from "lucide-react";
+import { LayoutDashboard, Users, CircleDollarSign, UserMinus, FileText, GraduationCap, PieChart, Network } from "lucide-react";
 
 const navItems = [
   { path: "/", label: "首页总览", icon: LayoutDashboard, end: true },
@@ -9,6 +9,7 @@ const navItems = [
   { path: "/salary", label: "工资执行", icon: FileText },
   { path: "/training", label: "培训情况", icon: GraduationCap },
   { path: "/budget", label: "预算执行监控", icon: PieChart },
+  { path: "/org",    label: "组织架构",     icon: Network  },
 ];
 
 export function Sidebar() {

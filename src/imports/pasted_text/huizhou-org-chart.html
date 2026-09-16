@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>惠州城投组织架构图</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:PingFang SC,Microsoft YaHei;}
+body{background:#fff;padding:30px;}
+.tree-container{display:flex;flex-direction:column;align-items:center;gap:24px;}
+/* 节点通用样式 */
+.node{padding:10px 16px;border-radius:6px;text-align:center;min-width:110px;font-size:13px;position:relative;}
+.node-yellow{background:#ffe9b3;border:1px solid #f7c360;color:#333;}
+.node-blue{background:#d6e4f7;border:1px solid #84a9d8;color:#222;}
+.node-darkblue{background:#4477bb;color:#fff;border-radius:4px;min-width:95px;padding:8px 12px;font-size:12px;}
+.node-lightblue{background:#c9e0f9;border:1px solid #72a6e3;color:#222;}
+/* 层级容器 */
+.level-row{display:flex;gap:12px;justify-content:center;align-items:flex-start;position:relative;}
+.level-col{display:flex;flex-direction:column;align-items:center;gap:8px;}
+/* 连接线简易示意（Figma可手动替换矢量线条） */
+.line-vertical{width:1px;height:20px;background:#b3c7e8;margin:0 auto;}
+.line-horizontal{height:1px;background:#b3c7e8;position:absolute;z-index:-1;}
+/* 底部在编小字 */
+.node-sub{font-size:10px;margin-top:4px;opacity:0.7;}
+/* 顶部操作栏 */
+.tool-bar{display:flex;gap:8px;margin-bottom:20px;width:100%;}
+.tool-btn{padding:6px 12px;background:#3488eb;color:#fff;border:none;border-radius:4px;font-size:12px;}
+.switch-tag{display:flex;}
+.switch-tag>div{padding:6px 12px;border:1px solid #99c3f5;font-size:12px;}
+.switch-tag .active{background:#4288ed;color:#fff;border-color:#4288ed;}
+</style>
+</head>
+<body>
+<div class="tool-bar">
+    <button class="tool-btn">重置架构图</button>
+    <button class="tool-btn">保存当前版本</button>
+    <button class="tool-btn">查看隐藏节点</button>
+    <button class="tool-btn">调整架构图</button>
+    <div class="switch-tag">
+        <div class="active">简称</div>
+        <div>全称</div>
+    </div>
+</div>
+
+<div class="tree-container">
+    <!-- 顶层：董事会 -->
+    <div class="node node-yellow">董事会</div>
+    <div class="line-vertical"></div>
+
+    <!-- 第二层：经营班子/高管 -->
+    <div class="node node-blue">
+        经营班子/高管
+        <div class="node-sub">在编：0 / 编制：8</div>
+    </div>
+    <div class="line-vertical"></div>
+
+    <!-- 第三层：集团本部 + 下属企业两大分支 -->
+    <div class="level-row" style="width:1600px;">
+        <!-- 左分支：集团本部 -->
+        <div class="level-col">
+            <div class="node node-yellow">集团本部</div>
+            <div class="line-vertical"></div>
+            <!-- 集团本部职能部门（红框第一组） -->
+            <div class="level-row">
+                <div class="node node-blue">党委办公室（人力）<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">综合办公室（董事会）<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">资金管理财务中心<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">投资拓展部<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">法务管理部<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">项目工管办公室（总办）<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">监督审计部<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">经营管理部<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">纪检监察组<div class="node-sub">在编…</div></div>
+            </div>
+            <div class="line-vertical"></div>
+            <!-- 集团本部下层职能（红框第二组） -->
+            <div class="level-row">
+                <div class="node node-blue">经营班子<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">高管<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">综合办管安部、生产党群经办<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">财务管理部<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">计粮规划采购站<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">监控审计部<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">粮食和物资储备部<div class="node-sub">在编…</div></div>
+                <div class="node node-blue">农司农副产品销售公务<div class="node-sub">在编…</div></div>
+            </div>
+        </div>
+
+        <!-- 右分支：下属企业（含股权比例） -->
+        <div class="level-col">
+            <div class="node node-yellow">下属企业（含股权比例）</div>
+            <div class="line-vertical"></div>
+            <!-- 四大板块横向排列 -->
+            <div class="level-row">
+                <!-- 城市服务板块 -->
+                <div class="level-col">
+                    <div class="node node-yellow">城市服务板块</div>
+                    <div class="line-vertical"></div>
+                    <div class="level-row">
+                        <div class="node node-darkblue">惠州储备军粮供应有限公司<div class="node-sub">在编…</div></div>
+                        <div class="node node-darkblue">广惠东生鲜农产投资有限公司<div class="node-sub">在编…</div></div>
+                    </div>
+                </div>
+                <!-- 城市运营板块 -->
+                <div class="level-col">
+                    <div class="node node-yellow">城市运营板块</div>
+                    <div class="line-vertical"></div>
+                    <div class="node node-darkblue">惠运城市服务城投公司<div class="node-sub">在编…</div></div>
+                </div>
+                <!-- 城市建设板块 -->
+                <div class="level-col">
+                    <div class="node node-yellow">城市建设板块</div>
+                    <div class="line-vertical"></div>
+                    <div class="level-row">
+                        <div class="node node-darkblue">惠州安城建工程公司<div class="node-sub">在编…</div></div>
+                        <div class="node node-darkblue">惠州市政动迁建设公司<div class="node-sub">在编…</div></div>
+                        <div class="node node-darkblue">惠州建筑工程监理公司<div class="node-sub">在编…</div></div>
+                    </div>
+                </div>
+                <!-- 城市开发板块 -->
+                <div class="level-col">
+                    <div class="node node-yellow">城市开发板块</div>
+                    <div class="line-vertical"></div>
+                    <div class="level-row">
+                        <div class="node node-darkblue">惠州城投开发置业公司<div class="node-sub">在编…</div></div>
+                        <div class="node node-darkblue">惠发展城投有限公司<div class="node-sub">在编…</div></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 底层辅助板块 -->
+            <div class="level-row" style="margin-top:16px;">
+                <div class="node node-lightblue">农副产品销售公司(综合运营部)<div class="node-sub">在编：0 / 编制：0</div></div>
+                <div class="node node-lightblue">储军工会<div class="node-sub">在编：0 / 编制：0</div></div>
+                <div class="node node-lightblue">粮食集团<div class="node-sub">在编：0 / 编制：0</div></div>
+                <div class="node node-lightblue">外包人员<div class="node-sub">在编：0 / 编制：0</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
