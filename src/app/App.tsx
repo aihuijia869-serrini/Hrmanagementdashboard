@@ -40,7 +40,8 @@ import {
   LineChart,
   Line,
   CartesianGrid,
-  Legend
+  Legend,
+  ComposedChart
 } from "recharts";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -171,6 +172,23 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     );
   }
   return null;
+};
+
+// ── Custom XAxis Tick for Training Mode Distribution (Combining mode & category) ──
+const CustomMultiXTick = (props: any) => {
+  const { x, y, payload } = props;
+  const item = MULTI_X_TRAINING_MODE_DATA[payload?.index];
+  if (!item) return null;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={12} textAnchor="middle" fill="#0F172A" fontSize={11} fontWeight={700}>
+        {item.mode}
+      </text>
+      <text x={0} y={26} textAnchor="middle" fill="#64748B" fontSize={9.5}>
+        {item.category}
+      </text>
+    </g>
+  );
 };
 
 export default function App() {
@@ -890,7 +908,7 @@ export default function App() {
               <ModuleHeader title="培训计划执行率趋势" subtext="1-9月月度走势 (%)" />
               <div className="flex-1 min-h-0 w-full mt-1">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={PLAN_EXECUTION_TREND} margin={{ top: 10, right: 10, left: -22, bottom: 0 }}>
+                  <ComposedChart data={PLAN_EXECUTION_TREND} margin={{ top: 10, right: 10, left: -22, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorExec" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#2563EB" stopOpacity={0.35} />
@@ -903,26 +921,23 @@ export default function App() {
                     <Tooltip content={<CustomTooltip />} />
                     <Area type="monotone" dataKey="executionRate" name="执行率" stroke="#2563EB" strokeWidth={2.5} fillOpacity={1} fill="url(#colorExec)" />
                     <Line type="monotone" dataKey="target" name="目标线" stroke="#F59E0B" strokeDasharray="4 4" strokeWidth={1.5} dot={false} />
-                  </AreaChart>
+                  </ComposedChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {/* Bottom Card 2: 培训形式分布 (多 X 轴图: 双 X 轴维度展示) */}
+            {/* Bottom Card 2: 培训形式分布 (多 X 轴维度展示, 自定义 Tick 渲染) */}
             <div className="col-span-3 glass-card p-3 flex flex-col h-full">
               <div className="shimmer-line" />
               <ModuleHeader title="培训形式分布" subtext="多 X 轴维度 (形式/主模式/班次)" />
               <div className="flex-1 min-h-0 w-full mt-1">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={MULTI_X_TRAINING_MODE_DATA} margin={{ top: 22, right: 10, left: -20, bottom: 0 }}>
+                  <BarChart data={MULTI_X_TRAINING_MODE_DATA} margin={{ top: 15, right: 10, left: -20, bottom: 15 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false} />
-                    {/* Primary X-Axis at bottom: 培训形式 */}
-                    <XAxis xAxisId="mode" dataKey="mode" tick={{ fontSize: 11, fill: "#0F172A", fontWeight: 700 }} />
-                    {/* Secondary X-Axis at top: 课程模式分类 */}
-                    <XAxis xAxisId="category" dataKey="category" orientation="top" tick={{ fontSize: 9.5, fill: "#64748B" }} />
-                    <YAxis yAxisId="left" tick={{ fontSize: 10, fill: "#64748B" }} />
+                    <XAxis dataKey="mode" tick={<CustomMultiXTick />} interval={0} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: "#64748B" }} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Bar xAxisId="mode" yAxisId="left" dataKey="classCount" name="班级数量 (个)" radius={[6, 6, 0, 0]} barSize={26}>
+                    <Bar dataKey="classCount" name="班级数量 (个)" radius={[6, 6, 0, 0]} barSize={26}>
                       {MULTI_X_TRAINING_MODE_DATA.map((entry, index) => (
                         <Cell key={`multi-x-bar-${index}`} fill={entry.color} />
                       ))}
